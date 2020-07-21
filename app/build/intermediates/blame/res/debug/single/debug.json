@@ -16,6 +16,10 @@
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable-v24/ic_launcher_foreground.xml"
     },
     {
+        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/drawable_ic_avatar.png.flat",
+        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable/ic_avatar.png"
+    },
+    {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher.png.flat",
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
     },
@@ -48,16 +52,24 @@
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/drawable_ic_account_box.xml.flat",
+        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable/ic_account_box.xml"
     },
     {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/mipmap-xhdpi_ic_launcher.png.flat",
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
     },
     {
+        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/mipmap-hdpi_ic_launcher.png.flat",
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/drawable_ic_lock.xml.flat",
+        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable/ic_lock.xml"
     },
     {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/drawable_ic_launcher_background.xml.flat",
