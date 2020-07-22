@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -103,15 +104,15 @@ public class ActivityLogin extends AppCompatActivity {
                                 if (latitude != null && longitude != null) {
                                     performLogin(imei_num, user_id, pass, latitude, longitude);
                                 } else {
-                                    showDialog("Ops! Can not read the location information. Please try again.");
+                                    showDialog("Error!", "Ops! Can not read the location information. Please try again.");
                                     getLocation();
                                 }
                             } else {
-                                showDialog("Ops! Can not read the IMEI number. Please try again.");
+                                showDialog("Error!", "Ops! Can not read the IMEI number. Please try again.");
                                 getImeiNum();
                             }
                         } else {
-                            showDialog("Ops! Internet is not available. Please connect to the " +
+                            showDialog("No internet", "Ops! Internet is not available. Please connect to the " +
                                     "internet and try again!");
                         }
                     }
@@ -121,8 +122,8 @@ public class ActivityLogin extends AppCompatActivity {
         });
     }
 
-    void showDialog(String message) {
-        dialogBuilder.setTitle("No internet")
+    void showDialog(String title, String message) {
+        dialogBuilder.setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
@@ -321,6 +322,12 @@ public class ActivityLogin extends AppCompatActivity {
             }
         });
 
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
+
         queue.add(request);
     }
 
@@ -354,6 +361,12 @@ public class ActivityLogin extends AppCompatActivity {
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
             }
         });
+
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
 
         queue.add(request);
     }
@@ -394,6 +407,12 @@ public class ActivityLogin extends AppCompatActivity {
                 error.printStackTrace();
             }
         });
+
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
 
         queue.add(request);
     }

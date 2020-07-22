@@ -1761,6 +1761,8 @@ id password_toggle
 id peekHeight
 id percent
 id pin
+id presence_check_customer_button
+id presence_spinner
 id progress_circular
 id progress_horizontal
 id radio
@@ -1933,6 +1935,7 @@ layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
 layout activity_login
+layout activity_presence
 layout custom_dialog
 layout design_bottom_navigation_item
 layout design_bottom_sheet_dialog
@@ -2037,6 +2040,7 @@ string bottom_sheet_behavior
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
+string check_customers
 string chip_text
 string clear_text_end_icon_content_description
 string common_google_play_services_enable_button
