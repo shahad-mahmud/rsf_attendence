@@ -10,7 +10,10 @@ import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -30,6 +33,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
 import com.shahad.rsfattendence.helperClasses.InternetCheck;
 import com.shahad.rsfattendence.helperClasses.LoadingDialog;
 
@@ -56,10 +60,43 @@ public class ActivitySendPresence extends AppCompatActivity {
     private String latitude;
     private String longitude;
 
+    private int spinnerSelectionTurn = 0;
+
     //-------------UI elements--------------------
     private TextView promptTextView;
     private Spinner customerSpinner;
-    private MaterialButton checkCustomerButton;
+    private MaterialButton checkCustomerButton, panelSerialScanButton, batterySerialScanButton,
+            sendPresenceButton;
+
+    private RelativeLayout panelSerialLayout, batterySerialLayout, spinnerLayout;
+    private TextInputEditText panelSerialInput, batterySerialInput;
+
+    private ImageButton spinnerButton;
+    private View.OnClickListener spinnerOnclickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            customerSpinner.performClick();
+        }
+    };
+    private AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            if (spinnerSelectionTurn != 0) {
+                panelSerialLayout.setVisibility(View.VISIBLE);
+                batterySerialLayout.setVisibility(View.VISIBLE);
+                sendPresenceButton.setVisibility(View.VISIBLE);
+            }
+
+            spinnerSelectionTurn += 1;
+
+            Log.d(TAG + " spinner", String.valueOf(position));
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,6 +135,9 @@ public class ActivitySendPresence extends AppCompatActivity {
                 });
             }
         });
+
+        customerSpinner.setOnItemSelectedListener(itemSelectedListener);
+        spinnerButton.setOnClickListener(spinnerOnclickListener);
     }
 
     void findElements() {
@@ -106,6 +146,18 @@ public class ActivitySendPresence extends AppCompatActivity {
         customerSpinner = findViewById(R.id.presence_spinner);
 
         checkCustomerButton = findViewById(R.id.presence_check_customer_button);
+        panelSerialScanButton = findViewById(R.id.presence_panel_serial_scan_button);
+        batterySerialScanButton = findViewById(R.id.presence_battery_serial_scan_button);
+        sendPresenceButton = findViewById(R.id.presence_send_button);
+
+        panelSerialLayout = findViewById(R.id.presence_panel_serial_holder);
+        batterySerialLayout = findViewById(R.id.presence_battery_serial_holder);
+        spinnerLayout = findViewById(R.id.presence_spinner_holder);
+
+        panelSerialInput = findViewById(R.id.presence_panel_serial_input);
+        batterySerialInput = findViewById(R.id.presence_battery_serial_input);
+
+        spinnerButton = findViewById(R.id.presence_spinner_open_button);
     }
 
     void showDialog(String title, String message) {
@@ -121,8 +173,11 @@ public class ActivitySendPresence extends AppCompatActivity {
     }
 
     void populateSpinner(ArrayList<String> list) {
-        promptTextView.setVisibility(View.GONE);
-        customerSpinner.setVisibility(View.VISIBLE);
+//        promptTextView.setVisibility(View.GONE);
+        spinnerLayout.setVisibility(View.VISIBLE);
+
+        String promptMessage = "Select a customer to continue or check again.";
+        promptTextView.setText(promptMessage);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, list);

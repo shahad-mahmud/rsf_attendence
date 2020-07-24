@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:animateLayoutChanges="true"
         tools:ignore="UselessParent">
 
         <TextView
@@ -19,28 +20,50 @@
             android:layout_centerHorizontal="true"
             android:text="@string/please_check_customers_to_continue" />
 
-        <Spinner
-            android:id="@+id/presence_spinner"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        <RelativeLayout
+            android:id="@+id/presence_spinner_holder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/presence_prompt_text"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
-            android:background="@color/colorAccent"
+            android:animateLayoutChanges="true"
+            android:background="@drawable/curved_corner"
             android:gravity="center"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
-            android:spinnerMode="dialog"
-            android:textAlignment="center"
-            android:visibility="gone" />
+            android:padding="1dp"
+            android:visibility="gone">
+
+            <Spinner
+                android:id="@+id/presence_spinner"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/presence_spinner_open_button"
+                android:background="@drawable/curved_corner_spinner"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:spinnerMode="dialog"
+                android:textAlignment="center" />
+
+            <ImageButton
+                android:id="@+id/presence_spinner_open_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@android:color/transparent"
+                android:padding="4dp"
+                android:src="@drawable/ic_arrow_drop_down_circle_24" />
+        </RelativeLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/presence_check_customer_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/presence_spinner"
+            android:layout_below="@id/presence_spinner_holder"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="24dp"
             android:text="@string/check_customers" />
@@ -55,6 +78,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
+            android:animateLayoutChanges="true"
             android:orientation="horizontal"
             android:visibility="gone">
 
@@ -69,7 +93,7 @@
                 app:hintAnimationEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/login_user_id"
+                    android:id="@+id/presence_panel_serial_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/panel_serial" />
@@ -100,6 +124,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
             android:layout_marginRight="32dp"
+            android:animateLayoutChanges="true"
             android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -112,7 +137,7 @@
                 app:hintAnimationEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/login_user_pass"
+                    android:id="@+id/presence_battery_serial_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/battery_serial"
