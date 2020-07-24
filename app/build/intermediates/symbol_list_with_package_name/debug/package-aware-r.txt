@@ -1700,6 +1700,8 @@ id line3
 id linear
 id listMode
 id list_item
+id loading_progress_bar
+id loading_text
 id login_button
 id login_image
 id login_user_id
@@ -1761,7 +1763,15 @@ id password_toggle
 id peekHeight
 id percent
 id pin
+id presence_battery_serial_holder
+id presence_battery_serial_layout
+id presence_battery_serial_scan_button
 id presence_check_customer_button
+id presence_panel_serial_holder
+id presence_panel_serial_layout
+id presence_panel_serial_scan_button
+id presence_prompt_text
+id presence_send_button
 id presence_spinner
 id progress_circular
 id progress_horizontal
@@ -1943,6 +1953,7 @@ layout design_layout_snackbar
 layout design_layout_snackbar_include
 layout design_layout_tab_icon
 layout design_layout_tab_text
+layout design_loading_dialog
 layout design_menu_item_action_area
 layout design_navigation_item
 layout design_navigation_item_header
@@ -2036,6 +2047,7 @@ string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
 string app_name
 string appbar_scrolling_view_behavior
+string battery_serial
 string bottom_sheet_behavior
 string character_counter_content_description
 string character_counter_overflowed_content_description
@@ -2070,6 +2082,7 @@ string helper_text_user_id
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string item_view_role_description
+string loading
 string login_button
 string mtrl_badge_numberless_content_description
 string mtrl_chip_close_icon_content_description
@@ -2109,13 +2122,17 @@ string mtrl_picker_toggle_to_year_selection
 string mtrl_slider_range_content_description
 string nav_app_bar_navigate_up_description
 string nav_app_bar_open_drawer_description
+string panel_serial
 string password
 string password_toggle_content_description
 string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
+string please_check_customers_to_continue
+string scan
 string search_menu_title
+string send
 string status_bar_notification_info_overflow
 string user_id
 string version_num

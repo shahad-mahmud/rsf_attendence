@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,10 +31,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.shahad.rsfattendence.helperClasses.InternetCheck;
+import com.shahad.rsfattendence.helperClasses.LoadingDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /*
  * Created by SHAHAD MAHMUD on 7/22/20
@@ -43,17 +47,19 @@ public class ActivitySendPresence extends AppCompatActivity {
     private static final String SERVICE_ACCESS_USER_NAME = "RSFWSA";
     private static final String SERVICE_ACCESS_CODE = "abcd12345";
 
-
-    private Spinner customerSpinner;
-    private MaterialButton checkCustomerButton;
-
     private RequestQueue queue;
     private MaterialAlertDialogBuilder dialogBuilder;
+    private LoadingDialog loadingDialog;
 
     private String imei_num = "";
 
     private String latitude;
     private String longitude;
+
+    //-------------UI elements--------------------
+    private TextView promptTextView;
+    private Spinner customerSpinner;
+    private MaterialButton checkCustomerButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,9 +68,9 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         queue = Volley.newRequestQueue(ActivitySendPresence.this);
         dialogBuilder = new MaterialAlertDialogBuilder(ActivitySendPresence.this);
+        loadingDialog = new LoadingDialog(ActivitySendPresence.this);
 
         findElements();
-        populateSpinner();
 
         getImeiNum();
         getLocation();
@@ -95,6 +101,8 @@ public class ActivitySendPresence extends AppCompatActivity {
     }
 
     void findElements() {
+        promptTextView = findViewById(R.id.presence_prompt_text);
+
         customerSpinner = findViewById(R.id.presence_spinner);
 
         checkCustomerButton = findViewById(R.id.presence_check_customer_button);
@@ -112,17 +120,18 @@ public class ActivitySendPresence extends AppCompatActivity {
                 .show();
     }
 
-    void populateSpinner() {
-        String[] arraySpinner = new String[]{
-                "1", "2", "3", "4", "5", "6", "7"
-        };
+    void populateSpinner(ArrayList<String> list) {
+        promptTextView.setVisibility(View.GONE);
+        customerSpinner.setVisibility(View.VISIBLE);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
+                android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         customerSpinner.setAdapter(adapter);
     }
 
     private void getImeiNum() {
+        loadingDialog.startLoadingDialog("Reading IMEI number...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivitySendPresence.this,
                 Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
@@ -136,7 +145,9 @@ public class ActivitySendPresence extends AppCompatActivity {
                 imei_num = telephonyManager.getDeviceId(0);
                 Log.i(TAG + " IMEI", imei_num);
             }
+            loadingDialog.dismissLoadingDialog();
         } else {
+            loadingDialog.dismissLoadingDialog();
             //permission is not granted. Show error
             showDialog("Permission not granted", "Permission to read IMEI number is not " +
                     "granted. Please log in again with granting the permissions.");
@@ -144,6 +155,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     }
 
     private void getLocation() {
+        loadingDialog.startLoadingDialog("Reading current location...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivitySendPresence.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -178,9 +190,11 @@ public class ActivitySendPresence extends AppCompatActivity {
                                                 + "long: " + longitude
                                 );
                             }
+                            loadingDialog.dismissLoadingDialog();
                         }
                     }, Looper.getMainLooper());
         } else {
+            loadingDialog.dismissLoadingDialog();
             //permission is not granted. Ask for permission
             showDialog("Permission not granted", "Permission to read Location is not " +
                     "granted. Please log in again with granting the permissions.");
@@ -188,6 +202,8 @@ public class ActivitySendPresence extends AppCompatActivity {
     }
 
     void getCustomers() {
+        loadingDialog.startLoadingDialog("Fetching Customer List...");
+
         String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
                 "CustomerInfo?DeviceID=" + imei_num + "&PanelSerialNo=&BatterySerialNo=&LocationLatitude=" +
                 latitude + "&LocationLongitude=" + longitude + "&ServiceAccessUserName=" +
@@ -201,22 +217,34 @@ public class ActivitySendPresence extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         if (response != null) {
                             Log.d(TAG + " LOGIN", response.toString());
-
                             try {
                                 JSONArray jsonArray = response.getJSONArray("CustomerInfo");
-                                JSONObject info = jsonArray.getJSONObject(0);
-                                Log.d(TAG + " LOGIN", info.toString());
+                                int lenOfArray = jsonArray.length();
+                                ArrayList<String> cusList = new ArrayList<String>();
+
+                                for (int i = 0; i < lenOfArray; i++) {
+                                    JSONObject object = jsonArray.getJSONObject(i);
+                                    String temp = object.getString("CustomerName");
+                                    Log.d(TAG + " cus Str", temp);
+                                    cusList.add(temp);
+                                }
+
+                                populateSpinner(cusList);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
                         }
+                        loadingDialog.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
+                loadingDialog.dismissLoadingDialog();
+                showDialog("Error", "Error occurred while fetching the customer" +
+                        " list. Please try again.");
             }
         });
 

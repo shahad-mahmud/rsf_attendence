@@ -1,4 +1,4 @@
-#Wed Jul 22 22:31:53 BDT 2020
+#Fri Jul 24 19:00:13 BDT 2020
 base.0=/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 path.1=classes.dex
 renamed.1=classes2.dex

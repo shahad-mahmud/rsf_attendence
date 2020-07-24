@@ -20,6 +20,10 @@
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable/ic_avatar.png"
     },
     {
+        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/layout_design_loading_dialog.xml.flat",
+        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/layout/design_loading_dialog.xml"
+    },
+    {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher.png.flat",
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
     },
