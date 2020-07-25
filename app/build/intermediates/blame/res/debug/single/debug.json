@@ -56,6 +56,10 @@
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/layout/activity_login.xml"
     },
     {
+        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/layout_activity_scanner.xml.flat",
+        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/layout/activity_scanner.xml"
+    },
+    {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/mipmap-xxhdpi_ic_launcher.png.flat",
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
     },

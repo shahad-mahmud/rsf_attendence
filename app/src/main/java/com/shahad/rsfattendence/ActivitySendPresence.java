@@ -1,8 +1,10 @@
 package com.shahad.rsfattendence;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,6 +53,9 @@ public class ActivitySendPresence extends AppCompatActivity {
     private static final String TAG = "SEND_PRESENCE";
     private static final String SERVICE_ACCESS_USER_NAME = "RSFWSA";
     private static final String SERVICE_ACCESS_CODE = "abcd12345";
+
+    private static final int REQ_CODE_PANEL = 513;
+    private static final int REQ_CODE_BATTERY = 500;
 
     private RequestQueue queue;
     private MaterialAlertDialogBuilder dialogBuilder;
@@ -98,6 +104,22 @@ public class ActivitySendPresence extends AppCompatActivity {
         }
     };
 
+    private View.OnClickListener panelSerialScanListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(ActivitySendPresence.this, ActivityScanner.class);
+            startActivityForResult(intent, REQ_CODE_PANEL);
+        }
+    };
+
+    private View.OnClickListener batterySerialScanListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(ActivitySendPresence.this, ActivityScanner.class);
+            startActivityForResult(intent, REQ_CODE_BATTERY);
+        }
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +133,9 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         getImeiNum();
         getLocation();
+
+        panelSerialScanButton.setOnClickListener(panelSerialScanListener);
+        batterySerialScanButton.setOnClickListener(batterySerialScanListener);
 
         checkCustomerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -310,5 +335,45 @@ public class ActivitySendPresence extends AppCompatActivity {
         ));
 
         queue.add(request);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQ_CODE_PANEL: {
+                if (resultCode == Activity.RESULT_OK) {
+                    assert data != null;
+                    String panelSerialCode = data.getStringExtra("SCAN_RES");
+                    panelSerialInput.setText(panelSerialCode);
+                } else {
+                    Toast.makeText(
+                            ActivitySendPresence.this,
+                            "Can not read Panel serial. Please enter manually!",
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
+            }
+            break;
+
+            case REQ_CODE_BATTERY: {
+                if (resultCode == Activity.RESULT_OK) {
+                    assert data != null;
+                    String batterySerialCode = data.getStringExtra("SCAN_RES");
+                    batterySerialInput.setText(batterySerialCode);
+                } else {
+                    Toast.makeText(
+                            ActivitySendPresence.this,
+                            "Can not read Panel serial. Please enter manually!",
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
+            }
+            break;
+
+            default:
+                break;
+        }
     }
 }
