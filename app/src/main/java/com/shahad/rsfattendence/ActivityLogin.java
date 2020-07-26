@@ -4,8 +4,10 @@ package com.shahad.rsfattendence;
  */
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +37,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.shahad.rsfattendence.helperClasses.IconDialog;
 import com.shahad.rsfattendence.helperClasses.InternetCheck;
+import com.shahad.rsfattendence.helperClasses.LoadingDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,6 +62,9 @@ public class ActivityLogin extends AppCompatActivity {
     private static final int REQ_LOC_PER = 345;
     private static final int REQ_ALL_PER = 11;
 
+    private IconDialog iconDialog;
+    private LoadingDialog loadingDialog;
+
     private TextInputEditText user_id_input, user_pass_input;
     private MaterialButton login_button;
 
@@ -77,6 +84,8 @@ public class ActivityLogin extends AppCompatActivity {
 
         queue = Volley.newRequestQueue(ActivityLogin.this);
         dialogBuilder = new MaterialAlertDialogBuilder(ActivityLogin.this);
+        iconDialog = new IconDialog(ActivityLogin.this);
+        loadingDialog = new LoadingDialog(ActivityLogin.this);
 
         // get all the elements
         getElements();
@@ -104,34 +113,24 @@ public class ActivityLogin extends AppCompatActivity {
                                 if (latitude != null && longitude != null) {
                                     performLogin(imei_num, user_id, pass, latitude, longitude);
                                 } else {
-                                    showDialog("Error!", "Ops! Can not read the location information. Please try again.");
+                                    iconDialog.startIconDialog("Ops! Can not read Location " +
+                                            "information. Pleas try again!", R.drawable.ic_location);
                                     getLocation();
                                 }
                             } else {
-                                showDialog("Error!", "Ops! Can not read the IMEI number. Please try again.");
+                                iconDialog.startIconDialog("Ops! Can not read the IMEI number. " +
+                                        "Please try again.", R.drawable.ic_mobile_cross);
                                 getImeiNum();
                             }
                         } else {
-                            showDialog("No internet", "Ops! Internet is not available. Please connect to the " +
-                                    "internet and try again!");
+                            iconDialog.startIconDialog("Ops! Internet is not available. " +
+                                    "Please connect to the internet and try again!", R.drawable.ic_no_internet);
                         }
                     }
                 });
 
             }
         });
-    }
-
-    void showDialog(String title, String message) {
-        dialogBuilder.setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .show();
     }
 
     private void getElements() {
@@ -164,7 +163,9 @@ public class ActivityLogin extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("HardwareIds")
     private void getImeiNum() {
+//        loadingDialog.startLoadingDialog("Getting IMEI number...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivityLogin.this,
                 Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
@@ -174,12 +175,15 @@ public class ActivityLogin extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= 26) {
                 imei_num = telephonyManager.getImei(0);
                 Log.i(TAG + " IMEI", imei_num);
+//                loadingDialog.dismissLoadingDialog();
             } else {
                 imei_num = telephonyManager.getDeviceId(0);
                 Log.i(TAG + " IMEI", imei_num);
+//                loadingDialog.dismissLoadingDialog();
             }
         } else {
             //permission is not granted. Ask for permission
+//            loadingDialog.dismissLoadingDialog();
             ActivityCompat.requestPermissions(
                     ActivityLogin.this,
                     new String[]{Manifest.permission.READ_PHONE_STATE},
@@ -189,6 +193,7 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private void getLocation() {
+//        loadingDialog.startLoadingDialog("Reading current location...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivityLogin.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -223,9 +228,11 @@ public class ActivityLogin extends AppCompatActivity {
                                                 + "long: " + longitude
                                 );
                             }
+//                            loadingDialog.dismissLoadingDialog();
                         }
                     }, Looper.getMainLooper());
         } else {
+//            loadingDialog.dismissLoadingDialog();
             //permission is not granted. Ask for permission
             ActivityCompat.requestPermissions(ActivityLogin.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC_PER
@@ -304,6 +311,8 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private void getAccessCode() {
+        final LoadingDialog loadingDialogAC = new LoadingDialog(ActivityLogin.this);
+        loadingDialogAC.startLoadingDialog("Getting access code...");
         String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
                 "ServiceAccessCode?ServiceAccessUserName=RSFWSA&ServiceAccessPassword=abcd12345";
         JsonObjectRequest request = new JsonObjectRequest(url, null,
@@ -313,10 +322,12 @@ public class ActivityLogin extends AppCompatActivity {
                         if (response != null) {
                             Log.d(TAG + " Access Code", response.toString());
                         }
+                        loadingDialogAC.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                loadingDialogAC.dismissLoadingDialog();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
             }
@@ -332,6 +343,8 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private void getDefaultDeviceId(String imei) {
+        final LoadingDialog loadingDialogDeviceId = new LoadingDialog(ActivityLogin.this);
+        loadingDialogDeviceId.startLoadingDialog("Getting device Id...");
         String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
                 "DefaultDeviceUserID?DeviceID=" + imei + "&DeviceAppVersionNo=02.7.0.0" +
                 "&ServiceAccessUserName=" + SERVICE_ACCESS_USER_NAME + "&ServiceAccessCode=" + SERVICE_ACCESS_CODE;
@@ -351,12 +364,13 @@ public class ActivityLogin extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
                         }
+                        loadingDialogDeviceId.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                loadingDialogDeviceId.dismissLoadingDialog();
                 error.printStackTrace();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
             }
@@ -372,6 +386,8 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     void performLogin(String deviceId, String used_id, String user_pass, String lat, String lon) {
+        final LoadingDialog loadingDialogLogin = new LoadingDialog(ActivityLogin.this);
+        loadingDialogLogin.startLoadingDialog("Logging in...");
         Log.d(TAG + " user_id", used_id);
         Log.d(TAG + " pass", user_pass);
         String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
@@ -392,17 +408,37 @@ public class ActivityLogin extends AppCompatActivity {
                             try {
                                 JSONArray jsonArray = response.getJSONArray("SecurityInfo");
                                 JSONObject info = jsonArray.getJSONObject(0);
-//                                String deviceId = info.getString("DefaultDeviceUserID");
+
+                                if (info.getString("MessageCode").equals("200")) {
+                                    loadingDialogLogin.dismissLoadingDialog();
+                                    // login successful
+
+                                    //todo: save caches
+
+                                    // go to next activity
+                                    Intent intent = new Intent(ActivityLogin.this, ActivitySendPresence.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    // login failed
+                                    loadingDialogLogin.dismissLoadingDialog();
+
+                                    iconDialog.startIconDialog(info.getString("MessageText"),
+                                            R.drawable.ic_cross);
+
+                                }
+
                                 Log.d(TAG + " LOGIN", info.toString());
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
                         }
+                        loadingDialogLogin.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                loadingDialogLogin.dismissLoadingDialog();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
             }

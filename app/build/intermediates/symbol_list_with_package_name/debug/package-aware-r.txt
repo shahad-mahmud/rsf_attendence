@@ -1659,15 +1659,21 @@ drawable googleg_standard_color_18
 drawable ic_account_box
 drawable ic_arrow_drop_down_circle_24
 drawable ic_avatar
+drawable ic_check
 drawable ic_clock_black_24dp
+drawable ic_cross
+drawable ic_internet
 drawable ic_keyboard_black_24dp
 drawable ic_launcher_background
 drawable ic_launcher_foreground
+drawable ic_location
 drawable ic_lock
+drawable ic_mobile_cross
 drawable ic_mtrl_checked_circle
 drawable ic_mtrl_chip_checked_black
 drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
+drawable ic_no_internet
 drawable material_ic_calendar_black_24dp
 drawable material_ic_clear_black_24dp
 drawable material_ic_edit_black_24dp
@@ -1881,6 +1887,9 @@ id home
 id homeAsUp
 id honorRequest
 id icon
+id icon_dialog_button
+id icon_dialog_icon
+id icon_dialog_text
 id icon_group
 id icon_only
 id ifRoom
@@ -2202,6 +2211,7 @@ layout activity_scanner
 layout custom_dialog
 layout design_bottom_navigation_item
 layout design_bottom_sheet_dialog
+layout design_icon_text_dialog
 layout design_layout_snackbar
 layout design_layout_snackbar_include
 layout design_layout_tab_icon
@@ -2341,6 +2351,7 @@ string common_open_on_phone
 string common_signin_button_text
 string common_signin_button_text_long
 string company_logo
+string dialog_icon
 string error_icon_content_description
 string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
@@ -2401,6 +2412,7 @@ string mtrl_picker_toggle_to_text_input_mode
 string mtrl_picker_toggle_to_year_selection
 string nav_app_bar_navigate_up_description
 string nav_app_bar_open_drawer_description
+string okay
 string panel_serial
 string password
 string password_toggle_content_description

@@ -31,9 +31,9 @@ public class ActivityScanner extends AppCompatActivity {
     private static final int REQ_CAMERA_PER = 539;
 
     private SurfaceView scannerSurface;
-    private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
     private ToneGenerator toneGenerator;
+
     private SurfaceHolder.Callback surfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
@@ -108,7 +108,7 @@ public class ActivityScanner extends AppCompatActivity {
     }
 
     void initializeBarcodeEssentials() {
-        barcodeDetector = new BarcodeDetector.Builder(ActivityScanner.this)
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(ActivityScanner.this)
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
 

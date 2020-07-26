@@ -1,6 +1,7 @@
 package com.shahad.rsfattendence;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,6 +38,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.shahad.rsfattendence.helperClasses.IconDialog;
 import com.shahad.rsfattendence.helperClasses.InternetCheck;
 import com.shahad.rsfattendence.helperClasses.LoadingDialog;
 
@@ -45,6 +47,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /*
  * Created by SHAHAD MAHMUD on 7/22/20
@@ -60,6 +63,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private RequestQueue queue;
     private MaterialAlertDialogBuilder dialogBuilder;
     private LoadingDialog loadingDialog;
+    private IconDialog iconDialog;
 
     private String imei_num = "";
 
@@ -67,6 +71,9 @@ public class ActivitySendPresence extends AppCompatActivity {
     private String longitude;
 
     private int spinnerSelectionTurn = 0;
+    private String selectedCustomerId;
+    private ArrayList<String> cusList;
+    private ArrayList<String> cusCodeList;
 
     //-------------UI elements--------------------
     private TextView promptTextView;
@@ -88,9 +95,14 @@ public class ActivitySendPresence extends AppCompatActivity {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             if (spinnerSelectionTurn != 0) {
+
+                if (cusCodeList != null)
+                    selectedCustomerId = cusCodeList.get(position);
+
                 panelSerialLayout.setVisibility(View.VISIBLE);
                 batterySerialLayout.setVisibility(View.VISIBLE);
                 sendPresenceButton.setVisibility(View.VISIBLE);
+                promptTextView.setVisibility(View.GONE);
             }
 
             spinnerSelectionTurn += 1;
@@ -119,6 +131,74 @@ public class ActivitySendPresence extends AppCompatActivity {
             startActivityForResult(intent, REQ_CODE_BATTERY);
         }
     };
+    private View.OnClickListener sendPresenceOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //check internet
+            new InternetCheck(new InternetCheck.Consumer() {
+                @Override
+                public void accept(Boolean internet) {
+                    if (internet) {
+                        if (imei_num != null && latitude != null && longitude != null) {
+
+                            boolean isOk = true;
+                            String panelSerial = "";
+                            String batterySerial = "";
+
+                            if (panelSerialInput != null)
+                                panelSerial = Objects.requireNonNull(panelSerialInput.getText()).toString();
+                            if (batterySerialInput != null)
+                                batterySerial = Objects.requireNonNull(batterySerialInput.getText()).toString();
+
+                            if (selectedCustomerId == null)
+                                isOk = false;
+
+                            if (isOk)
+                                sendPresence(panelSerial, batterySerial);
+                            else
+                                Toast.makeText(
+                                        ActivitySendPresence.this,
+                                        "Can not send presence. Please try again",
+                                        Toast.LENGTH_LONG
+                                ).show();
+                        } else {
+                            showDialog("Error!", "Ops! Can not read the IMEI " +
+                                    "number or Location. Please try again.");
+                            getImeiNum();
+                            getLocation();
+                        }
+                    } else {
+                        showDialog("No internet", "Ops! Internet is not available. Please connect to the " +
+                                "internet and try again!");
+                    }
+                }
+            });
+        }
+    };
+    private View.OnClickListener customerCheckOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //check internet
+            new InternetCheck(new InternetCheck.Consumer() {
+                @Override
+                public void accept(Boolean internet) {
+                    if (internet) {
+                        if (imei_num != null && latitude != null && longitude != null) {
+                            getCustomers();
+                        } else {
+                            showDialog("Error!", "Ops! Can not read the IMEI " +
+                                    "number or Location. Please try again.");
+                            getImeiNum();
+                            getLocation();
+                        }
+                    } else {
+                        showDialog("No internet", "Ops! Internet is not available. Please connect to the " +
+                                "internet and try again!");
+                    }
+                }
+            });
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,6 +208,7 @@ public class ActivitySendPresence extends AppCompatActivity {
         queue = Volley.newRequestQueue(ActivitySendPresence.this);
         dialogBuilder = new MaterialAlertDialogBuilder(ActivitySendPresence.this);
         loadingDialog = new LoadingDialog(ActivitySendPresence.this);
+        iconDialog = new IconDialog(ActivitySendPresence.this);
 
         findElements();
 
@@ -137,32 +218,10 @@ public class ActivitySendPresence extends AppCompatActivity {
         panelSerialScanButton.setOnClickListener(panelSerialScanListener);
         batterySerialScanButton.setOnClickListener(batterySerialScanListener);
 
-        checkCustomerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //check internet
-                new InternetCheck(new InternetCheck.Consumer() {
-                    @Override
-                    public void accept(Boolean internet) {
-                        if (internet) {
-                            if (imei_num != null && latitude != null && longitude != null) {
-                                getCustomers();
-                            } else {
-                                showDialog("Error!", "Ops! Can not read the IMEI " +
-                                        "number or Location. Please try again.");
-                                getImeiNum();
-                            }
-                        } else {
-                            showDialog("No internet", "Ops! Internet is not available. Please connect to the " +
-                                    "internet and try again!");
-                        }
-                    }
-                });
-            }
-        });
-
+        checkCustomerButton.setOnClickListener(customerCheckOnClickListener);
         customerSpinner.setOnItemSelectedListener(itemSelectedListener);
         spinnerButton.setOnClickListener(spinnerOnclickListener);
+        sendPresenceButton.setOnClickListener(sendPresenceOnClickListener);
     }
 
     void findElements() {
@@ -210,6 +269,7 @@ public class ActivitySendPresence extends AppCompatActivity {
         customerSpinner.setAdapter(adapter);
     }
 
+    @SuppressLint("HardwareIds")
     private void getImeiNum() {
         loadingDialog.startLoadingDialog("Reading IMEI number...");
         // first check for permission
@@ -300,13 +360,17 @@ public class ActivitySendPresence extends AppCompatActivity {
                             try {
                                 JSONArray jsonArray = response.getJSONArray("CustomerInfo");
                                 int lenOfArray = jsonArray.length();
-                                ArrayList<String> cusList = new ArrayList<String>();
+                                cusList = new ArrayList<String>();
+                                cusCodeList = new ArrayList<String>();
 
                                 for (int i = 0; i < lenOfArray; i++) {
                                     JSONObject object = jsonArray.getJSONObject(i);
                                     String temp = object.getString("CustomerName");
+                                    String tempCode = object.getString("CustomerCode");
+
                                     Log.d(TAG + " cus Str", temp);
                                     cusList.add(temp);
+                                    cusCodeList.add(tempCode);
                                 }
 
                                 populateSpinner(cusList);
@@ -325,6 +389,68 @@ public class ActivitySendPresence extends AppCompatActivity {
                 loadingDialog.dismissLoadingDialog();
                 showDialog("Error", "Error occurred while fetching the customer" +
                         " list. Please try again.");
+            }
+        });
+
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
+
+        queue.add(request);
+    }
+
+    void sendPresence(String panelSerial, String batterySerial) {
+        loadingDialog.startLoadingDialog("Sending presence information...");
+
+        String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
+                "SendPresenceAtCustomerHome?DeviceID=" + imei_num + "&CustomerCode=" + selectedCustomerId +
+                "&PanelSerialNo=" + panelSerial + "&BatterySerialNo=" + batterySerial + "&LocationLatitude=" +
+                latitude + "&LocationLongitude=" + longitude + "&ServiceAccessUserName=" +
+                SERVICE_ACCESS_USER_NAME + "&ServiceAccessCode=" + SERVICE_ACCESS_CODE;
+
+        Log.d(TAG + " pres url", url);
+
+        final JsonObjectRequest request = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        if (response != null) {
+                            Log.d(TAG + " PRES", response.toString());
+                            try {
+                                JSONArray jsonArray = response.getJSONArray("ReturnMessage");
+                                JSONObject object = jsonArray.getJSONObject(0);
+
+                                Log.d(TAG + " PRE VW", object.toString());
+
+                                if (object.getString("MessageCode").equals("200")) {
+                                    // presence successful
+
+                                    iconDialog.startIconDialog("Presence successful",
+                                            R.drawable.ic_check);
+                                    Log.d(TAG + " PRE SC", object.getString("MessageText"));
+                                } else {
+                                    // presence not successful
+                                    iconDialog.startIconDialog(object.getString("MessageText"),
+                                            R.drawable.ic_cross);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                        loadingDialog.dismissLoadingDialog();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
+                error.printStackTrace();
+                loadingDialog.dismissLoadingDialog();
+                showDialog("Error", "Error occurred while sending presence information. " +
+                        "Please try again.");
             }
         });
 

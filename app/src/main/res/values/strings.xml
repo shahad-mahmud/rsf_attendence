@@ -15,4 +15,6 @@
     <string name="battery_serial">Battery Serial</string>
     <string name="scan">Scan</string>
     <string name="send">Send</string>
+    <string name="dialog_icon">dialog icon</string>
+    <string name="okay">Okay</string>
 </resources>

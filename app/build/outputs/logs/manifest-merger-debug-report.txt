@@ -129,13 +129,13 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] /home/shaha
 	android:label
 		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:18:9-41
 	android:fullBackupContent
-		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:15:9-41
+		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:16:9-41
 	android:roundIcon
 		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:19:9-54
 	android:icon
 		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:17:9-43
 	android:allowBackup
-		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:16:9-35
+		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:15:9-35
 	android:theme
 		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:21:9-40
 meta-data#com.google.android.gms.vision.DEPENDENCIES
@@ -144,28 +144,34 @@ ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/
 		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:25:13-36
 	android:name
 		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:24:13-70
-activity#com.shahad.rsfattendence.ActivitySendPresence
-ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:27:9-37:20
+activity#com.shahad.rsfattendence.MainActivity
+ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:27:9-36:20
 	android:label
 		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:29:13-45
+	android:theme
+		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:30:13-47
 	android:name
-		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:28:13-49
+		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:28:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:32:13-36:29
+ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:31:13-35:29
 action#android.intent.action.MAIN
-ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:33:17-69
+ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:32:17-69
 	android:name
-		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:33:25-66
+		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:32:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:35:17-77
+ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:34:17-77
 	android:name
-		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:35:27-74
+		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:34:27-74
 activity#com.shahad.rsfattendence.ActivityLogin
-ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:38:9-51
+ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:37:9-51
 	android:name
-		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:38:19-48
+		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:37:19-48
+activity#com.shahad.rsfattendence.ActivitySendPresence
+ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:38:9-57
+	android:name
+		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:38:19-55
 activity#com.shahad.rsfattendence.ActivityScanner
-ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:39:9-52
+ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:39:9-53
 	android:name
 		ADDED from /media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:39:19-50
 uses-sdk
