@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">RSF Attendence</string>
+    <!-- Strings used for fragments for navigation -->
+
+    <string name="company_logo">Company Logo</string>
+    <string name="user_id">User ID</string>
+    <string name="password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="version_num">V 0.0.0</string>
+    <string name="helper_text_user_id">Enter your RSF user ID.</string>
+    <string name="check_customers">Check Customers</string>
+    <string name="loading">Loading...</string>
+    <string name="please_check_customers_to_continue">Please check customers to continue!</string>
+    <string name="panel_serial">Panel Serial</string>
+    <string name="battery_serial">Battery Serial</string>
+    <string name="scan">Scan</string>
+    <string name="send">Send</string>
+    <string name="dialog_icon">dialog icon</string>
+    <string name="okay">Okay</string>
+</resources>
