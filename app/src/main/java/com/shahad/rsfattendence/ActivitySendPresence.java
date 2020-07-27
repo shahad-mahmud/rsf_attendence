@@ -271,7 +271,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
     @SuppressLint("HardwareIds")
     private void getImeiNum() {
-        loadingDialog.startLoadingDialog("Reading IMEI number...");
+//        loadingDialog.startLoadingDialog("Reading IMEI number...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivitySendPresence.this,
                 Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
@@ -285,9 +285,9 @@ public class ActivitySendPresence extends AppCompatActivity {
                 imei_num = telephonyManager.getDeviceId(0);
                 Log.i(TAG + " IMEI", imei_num);
             }
-            loadingDialog.dismissLoadingDialog();
+//            loadingDialog.dismissLoadingDialog();
         } else {
-            loadingDialog.dismissLoadingDialog();
+//            loadingDialog.dismissLoadingDialog();
             //permission is not granted. Show error
             showDialog("Permission not granted", "Permission to read IMEI number is not " +
                     "granted. Please log in again with granting the permissions.");
@@ -295,7 +295,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     }
 
     private void getLocation() {
-        loadingDialog.startLoadingDialog("Reading current location...");
+//        loadingDialog.startLoadingDialog("Reading current location...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivitySendPresence.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -330,11 +330,11 @@ public class ActivitySendPresence extends AppCompatActivity {
                                                 + "long: " + longitude
                                 );
                             }
-                            loadingDialog.dismissLoadingDialog();
+//                            loadingDialog.dismissLoadingDialog();
                         }
                     }, Looper.getMainLooper());
         } else {
-            loadingDialog.dismissLoadingDialog();
+//            loadingDialog.dismissLoadingDialog();
             //permission is not granted. Ask for permission
             showDialog("Permission not granted", "Permission to read Location is not " +
                     "granted. Please log in again with granting the permissions.");

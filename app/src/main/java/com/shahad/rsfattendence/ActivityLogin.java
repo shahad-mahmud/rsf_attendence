@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +36,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.shahad.rsfattendence.helperClasses.IconDialog;
 import com.shahad.rsfattendence.helperClasses.InternetCheck;
@@ -57,13 +57,17 @@ public class ActivityLogin extends AppCompatActivity {
     private static final String SERVICE_ACCESS_USER_NAME = "RSFWSA";
     private static final String SERVICE_ACCESS_CODE = "abcd12345";
 
+    private static final String SHARED_PREF_FILE_NAME = "sharedPrefForLogIn";
+    private static final String SHARED_PREF_KEY_USER_ID = "userId";
+    private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
+
+    SharedPreferences sharedPreferences;
+
     private static final int REQ_PHN_STATE_PER = 936;
-    private static final int REQ_INTERNET_PER = 711;
     private static final int REQ_LOC_PER = 345;
     private static final int REQ_ALL_PER = 11;
 
     private IconDialog iconDialog;
-    private LoadingDialog loadingDialog;
 
     private TextInputEditText user_id_input, user_pass_input;
     private MaterialButton login_button;
@@ -75,7 +79,6 @@ public class ActivityLogin extends AppCompatActivity {
     private String longitude;
 
     private String deviceId;
-    private MaterialAlertDialogBuilder dialogBuilder;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,9 +86,7 @@ public class ActivityLogin extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         queue = Volley.newRequestQueue(ActivityLogin.this);
-        dialogBuilder = new MaterialAlertDialogBuilder(ActivityLogin.this);
         iconDialog = new IconDialog(ActivityLogin.this);
-        loadingDialog = new LoadingDialog(ActivityLogin.this);
 
         // get all the elements
         getElements();
@@ -131,6 +132,15 @@ public class ActivityLogin extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (sharedPreferences == null)
+            sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
+        String uName = sharedPreferences.getString(SHARED_PREF_KEY_USER_ID, "");
+        user_id_input.setText(uName);
     }
 
     private void getElements() {
@@ -385,14 +395,14 @@ public class ActivityLogin extends AppCompatActivity {
         queue.add(request);
     }
 
-    void performLogin(String deviceId, String used_id, String user_pass, String lat, String lon) {
+    void performLogin(String deviceId, final String user_id, String user_pass, String lat, String lon) {
         final LoadingDialog loadingDialogLogin = new LoadingDialog(ActivityLogin.this);
         loadingDialogLogin.startLoadingDialog("Logging in...");
-        Log.d(TAG + " user_id", used_id);
+        Log.d(TAG + " user_id", user_id);
         Log.d(TAG + " pass", user_pass);
         String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
                 "LoginToRASolarERPMobileApp?DeviceID=" + deviceId + "&DeviceAppVersionNo=02.7.0.0&" +
-                "MobileAppUserID=" + used_id + "&MobileAppUserPassword=" + user_pass +
+                "MobileAppUserID=" + user_id + "&MobileAppUserPassword=" + user_pass +
                 "&LocationLatitude=" + lat + "&LocationLongitude=" + lon + "&ServiceAccessUserName="
                 + ActivityLogin.SERVICE_ACCESS_USER_NAME + "&ServiceAccessCode=" + ActivityLogin.SERVICE_ACCESS_CODE;
 
@@ -410,10 +420,18 @@ public class ActivityLogin extends AppCompatActivity {
                                 JSONObject info = jsonArray.getJSONObject(0);
 
                                 if (info.getString("MessageCode").equals("200")) {
-                                    loadingDialogLogin.dismissLoadingDialog();
                                     // login successful
+                                    // save user ID to cache
+                                    if (sharedPreferences == null)
+                                        sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME,
+                                                Context.MODE_PRIVATE);
 
-                                    //todo: save caches
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString(SHARED_PREF_KEY_USER_ID, user_id);
+                                    editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, true);
+                                    editor.apply();
+
+                                    loadingDialogLogin.dismissLoadingDialog();
 
                                     // go to next activity
                                     Intent intent = new Intent(ActivityLogin.this, ActivitySendPresence.class);
