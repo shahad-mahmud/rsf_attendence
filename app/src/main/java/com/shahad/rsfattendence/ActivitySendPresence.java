@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,8 +58,15 @@ public class ActivitySendPresence extends AppCompatActivity {
     private static final String SERVICE_ACCESS_USER_NAME = "RSFWSA";
     private static final String SERVICE_ACCESS_CODE = "abcd12345";
 
+    private static final String SHARED_PREF_FILE_NAME = "sharedPrefForLogIn";
+    private static final String SHARED_PREF_KEY_USER_ID = "userId";
+    private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
+    private static final int BACK_PRESS_TIME_INTERVAL = 2500; // time in milliseconds
+
     private static final int REQ_CODE_PANEL = 513;
     private static final int REQ_CODE_BATTERY = 500;
+    SharedPreferences sharedPreferences;
+    private long backPressTime;
 
     private RequestQueue queue;
     private MaterialAlertDialogBuilder dialogBuilder;
@@ -84,7 +92,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private RelativeLayout panelSerialLayout, batterySerialLayout, spinnerLayout;
     private TextInputEditText panelSerialInput, batterySerialInput;
 
-    private ImageButton spinnerButton;
+    private ImageButton spinnerButton, logOutButton;
     private View.OnClickListener spinnerOnclickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -200,6 +208,43 @@ public class ActivitySendPresence extends AppCompatActivity {
         }
     };
 
+    private View.OnClickListener logoutButtonOnclickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(ActivitySendPresence.this);
+            String message = "Are you sure to logout?";
+
+            builder.setCancelable(true)
+                    .setMessage(message)
+                    .setPositiveButton(
+                            "Yes",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME,
+                                            Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                                    editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false);
+                                    editor.apply();
+                                    finish();
+                                }
+                            }
+                    )
+                    .setNegativeButton(
+                            "No",
+                            null
+                    )
+                    .setNeutralButton(
+                            "Cancel",
+                            null
+                    );
+
+            builder.show();
+
+        }
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -222,6 +267,23 @@ public class ActivitySendPresence extends AppCompatActivity {
         customerSpinner.setOnItemSelectedListener(itemSelectedListener);
         spinnerButton.setOnClickListener(spinnerOnclickListener);
         sendPresenceButton.setOnClickListener(sendPresenceOnClickListener);
+        logOutButton.setOnClickListener(logoutButtonOnclickListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (backPressTime + BACK_PRESS_TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed();
+            return;
+        } else {
+            Toast.makeText(
+                    ActivitySendPresence.this,
+                    "Please press back again to exit",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+
+        backPressTime = System.currentTimeMillis();
     }
 
     void findElements() {
@@ -242,6 +304,7 @@ public class ActivitySendPresence extends AppCompatActivity {
         batterySerialInput = findViewById(R.id.presence_battery_serial_input);
 
         spinnerButton = findViewById(R.id.presence_spinner_open_button);
+        logOutButton = findViewById(R.id.presence_logout_button);
     }
 
     void showDialog(String title, String message) {

@@ -1668,6 +1668,7 @@ drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_location
 drawable ic_lock
+drawable ic_logout
 drawable ic_mobile_cross
 drawable ic_mtrl_checked_circle
 drawable ic_mtrl_chip_checked_black
@@ -2006,6 +2007,7 @@ id presence_battery_serial_input
 id presence_battery_serial_layout
 id presence_battery_serial_scan_button
 id presence_check_customer_button
+id presence_logout_button
 id presence_panel_serial_holder
 id presence_panel_serial_input
 id presence_panel_serial_layout
@@ -2362,6 +2364,7 @@ string icon_content_description
 string item_view_role_description
 string loading
 string login_button
+string logout_button
 string material_clock_display_divider
 string material_clock_toggle_content_description
 string material_hour_selection
@@ -2424,6 +2427,7 @@ string please_check_customers_to_continue
 string scan
 string search_menu_title
 string send
+string spinner_opener_button
 string status_bar_notification_info_overflow
 string user_id
 string version_num

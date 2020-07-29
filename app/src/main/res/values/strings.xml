@@ -17,4 +17,6 @@
     <string name="send">Send</string>
     <string name="dialog_icon">dialog icon</string>
     <string name="okay">Okay</string>
+    <string name="logout_button">Logout button</string>
+    <string name="spinner_opener_button">spinner opener button</string>
 </resources>

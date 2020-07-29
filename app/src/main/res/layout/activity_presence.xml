@@ -6,12 +6,24 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true">
 
+    <ImageButton
+        android:id="@+id/presence_logout_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/logout_button"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_logout" />
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:animateLayoutChanges="true"
-        tools:ignore="UselessParent">
+        tools:ignore="RelativeOverlap,UselessParent">
 
         <TextView
             android:id="@+id/presence_prompt_text"
@@ -56,6 +68,7 @@
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
                 android:padding="4dp"
+                android:contentDescription="@string/spinner_opener_button"
                 android:src="@drawable/ic_arrow_drop_down_circle_24" />
         </RelativeLayout>
 

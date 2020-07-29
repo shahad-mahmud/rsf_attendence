@@ -60,12 +60,16 @@ public class ActivityLogin extends AppCompatActivity {
     private static final String SHARED_PREF_FILE_NAME = "sharedPrefForLogIn";
     private static final String SHARED_PREF_KEY_USER_ID = "userId";
     private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
+    private static final String SHARED_PREF_KEY_LOGIN_TIME = "loginTime";
 
     SharedPreferences sharedPreferences;
 
     private static final int REQ_PHN_STATE_PER = 936;
     private static final int REQ_LOC_PER = 345;
     private static final int REQ_ALL_PER = 11;
+
+    private static final int BACK_PRESS_TIME_INTERVAL = 2500; // time in milliseconds
+    private long backPressTime;
 
     private IconDialog iconDialog;
 
@@ -141,6 +145,22 @@ public class ActivityLogin extends AppCompatActivity {
             sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
         String uName = sharedPreferences.getString(SHARED_PREF_KEY_USER_ID, "");
         user_id_input.setText(uName);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (backPressTime + BACK_PRESS_TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed();
+            return;
+        } else {
+            Toast.makeText(
+                    ActivityLogin.this,
+                    "Please press back again to exit",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+
+        backPressTime = System.currentTimeMillis();
     }
 
     private void getElements() {
@@ -429,6 +449,7 @@ public class ActivityLogin extends AppCompatActivity {
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString(SHARED_PREF_KEY_USER_ID, user_id);
                                     editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, true);
+                                    editor.putLong(SHARED_PREF_KEY_LOGIN_TIME, System.currentTimeMillis());
                                     editor.apply();
 
                                     loadingDialogLogin.dismissLoadingDialog();
