@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -202,15 +203,19 @@ public class ActivityLogin extends AppCompatActivity {
             // permission is already granted. Get the number
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             assert telephonyManager != null;
-            if (Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                imei_num = Settings.Secure.getString(
+                        getContentResolver(),
+                        Settings.Secure.ANDROID_ID
+                );
+            } else if (Build.VERSION.SDK_INT >= 26) {
                 imei_num = telephonyManager.getImei(0);
-                Log.i(TAG + " IMEI", imei_num);
-//                loadingDialog.dismissLoadingDialog();
+                //                loadingDialog.dismissLoadingDialog();
             } else {
                 imei_num = telephonyManager.getDeviceId(0);
-                Log.i(TAG + " IMEI", imei_num);
-//                loadingDialog.dismissLoadingDialog();
+                //                loadingDialog.dismissLoadingDialog();
             }
+            Log.i(TAG + " IMEI", imei_num);
         } else {
             //permission is not granted. Ask for permission
 //            loadingDialog.dismissLoadingDialog();
@@ -270,15 +275,6 @@ public class ActivityLogin extends AppCompatActivity {
         }
     }
 
-    private void showDialog(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", okListener)
-                .create()
-                .show();
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -318,19 +314,22 @@ public class ActivityLogin extends AppCompatActivity {
                             Manifest.permission.READ_PHONE_STATE)
                             || ActivityCompat.shouldShowRequestPermissionRationale(
                             this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        showDialog("Phone state and Location Services Permissions required for this app to continue",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        switch (which) {
-                                            case DialogInterface.BUTTON_POSITIVE:
+
+                        new AlertDialog.Builder(this)
+                                .setMessage("Phone state and Location Services Permissions required " +
+                                        "for this app to continue")
+                                .setPositiveButton(
+                                        "OK",
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
                                                 getPermissionsAndOthers();
-                                                break;
-                                            case DialogInterface.BUTTON_NEGATIVE:
-                                                break;
+                                            }
                                         }
-                                    }
-                                });
+                                )
+                                .setNegativeButton("Cancel", null)
+                                .create()
+                                .show();
                     } else {
                         Toast.makeText(this, "Go to settings and enable permissions", Toast.LENGTH_LONG)
                                 .show();
@@ -390,7 +389,7 @@ public class ActivityLogin extends AppCompatActivity {
                                 JSONArray jsonArray = response.getJSONArray("SecurityInfo");
                                 JSONObject info = jsonArray.getJSONObject(0);
                                 deviceId = info.getString("DefaultDeviceUserID");
-                                Log.d(TAG + " Device Id", deviceId.toString());
+                                Log.d(TAG + " Device Id", deviceId);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

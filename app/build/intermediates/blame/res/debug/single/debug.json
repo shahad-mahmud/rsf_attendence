@@ -52,6 +52,10 @@
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable/ic_account_box.xml"
     },
     {
+        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/drawable-xxhdpi_rsf_logo.jpg.flat",
+        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable-xxhdpi/rsf_logo.jpg"
+    },
+    {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/mipmap-xhdpi_ic_launcher.png.flat",
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
     },
@@ -102,6 +106,10 @@
     {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/drawable_ic_location.png.flat",
         "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable/ic_location.png"
+    },
+    {
+        "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/drawable_activity_back.xml.flat",
+        "source": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/res/drawable/activity_back.xml"
     },
     {
         "merged": "/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/build/intermediates/res/merged/debug/layout_design_icon_text_dialog.xml.flat",

@@ -976,6 +976,7 @@ color accent_material_dark
 color accent_material_light
 color androidx_core_ripple_material_light
 color androidx_core_secondary_text_default_material_light
+color back_color
 color background_floating_material_dark
 color background_floating_material_light
 color background_material_dark
@@ -1617,6 +1618,7 @@ drawable abc_textfield_search_activated_mtrl_alpha
 drawable abc_textfield_search_default_mtrl_alpha
 drawable abc_textfield_search_material
 drawable abc_vector_test
+drawable activity_back
 drawable avd_hide_password
 drawable avd_show_password
 drawable btn_checkbox_checked_mtrl
@@ -2017,6 +2019,7 @@ id presence_send_button
 id presence_spinner
 id presence_spinner_holder
 id presence_spinner_open_button
+id presence_toolbar
 id progress_circular
 id progress_horizontal
 id radio
@@ -2364,6 +2367,7 @@ string icon_content_description
 string item_view_role_description
 string loading
 string login_button
+string logout
 string logout_button
 string material_clock_display_divider
 string material_clock_toggle_content_description

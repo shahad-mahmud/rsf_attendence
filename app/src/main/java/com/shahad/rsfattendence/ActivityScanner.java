@@ -13,6 +13,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -21,6 +22,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.shahad.rsfattendence.helperClasses.IconDialog;
 
 import java.io.IOException;
 
@@ -34,25 +36,31 @@ public class ActivityScanner extends AppCompatActivity {
     private CameraSource cameraSource;
     private ToneGenerator toneGenerator;
 
+    IconDialog iconDialog;
+
     private SurfaceHolder.Callback surfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             // check Camera permission
-            try {
-                if (ActivityCompat.checkSelfPermission(ActivityScanner.this,
-                        Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted.
+            if (ActivityCompat.checkSelfPermission(ActivityScanner.this,
+                    Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted.
+                try {
                     cameraSource.start(scannerSurface.getHolder());
-                } else {
-                    // ask for permission
-                    ActivityCompat.requestPermissions(
-                            ActivityScanner.this,
-                            new String[]{Manifest.permission.CAMERA},
-                            REQ_CAMERA_PER
+                } catch (IOException e) {
+                    iconDialog.startIconDialog(
+                            "Can not start camera. Please try again!",
+                            R.drawable.ic_cross
                     );
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+                // ask for permission
+                ActivityCompat.requestPermissions(
+                        ActivityScanner.this,
+                        new String[]{Manifest.permission.CAMERA},
+                        REQ_CAMERA_PER
+                );
             }
         }
 
@@ -69,11 +77,7 @@ public class ActivityScanner extends AppCompatActivity {
     private Detector.Processor<Barcode> barcodeProcessor = new Detector.Processor<Barcode>() {
         @Override
         public void release() {
-            Toast.makeText(
-                    ActivityScanner.this,
-                    "Barcode scanner has stopped",
-                    Toast.LENGTH_LONG
-            ).show();
+
         }
 
         @Override
@@ -96,6 +100,8 @@ public class ActivityScanner extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
+
+        iconDialog = new IconDialog(ActivityScanner.this);
 
         findElements();
         initializeBarcodeEssentials();
@@ -133,5 +139,19 @@ public class ActivityScanner extends AppCompatActivity {
         super.onPause();
         if (cameraSource != null)
             cameraSource.release();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQ_CAMERA_PER) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initializeBarcodeEssentials();
+            } else {
+                Toast.makeText(this, "Permission was not granted." +
+                        " Can scan.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

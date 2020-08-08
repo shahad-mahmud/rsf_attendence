@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,8 +17,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
     private static final String SHARED_PREF_KEY_LOGIN_TIME = "loginTime";
 
-    private static final int AUTO_LOGIN_DURATION = 15000; // automatic login if last login time was
-    // less than 15 minutes.
+    private static final int AUTO_LOGIN_DURATION = 1800000; // automatic login if last login time was
+    // less than 30 minutes.
 
     SharedPreferences sharedPreferences;
 
@@ -28,7 +29,9 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
         long lastLoginTime = sharedPreferences.getLong(SHARED_PREF_KEY_LOGIN_TIME, 0);
 
-        if (lastLoginTime + AUTO_LOGIN_DURATION < System.currentTimeMillis() &&
+        Log.d("MAIN_ACT", String.valueOf(System.currentTimeMillis() - lastLoginTime));
+
+        if (System.currentTimeMillis() - lastLoginTime < AUTO_LOGIN_DURATION &&
                 sharedPreferences.getBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false)) {
             Intent intent = new Intent(MainActivity.this, ActivitySendPresence.class);
             startActivity(intent);

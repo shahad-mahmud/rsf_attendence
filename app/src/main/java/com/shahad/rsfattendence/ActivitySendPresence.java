@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -36,6 +37,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -59,7 +61,6 @@ public class ActivitySendPresence extends AppCompatActivity {
     private static final String SERVICE_ACCESS_CODE = "abcd12345";
 
     private static final String SHARED_PREF_FILE_NAME = "sharedPrefForLogIn";
-    private static final String SHARED_PREF_KEY_USER_ID = "userId";
     private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
     private static final int BACK_PRESS_TIME_INTERVAL = 2500; // time in milliseconds
 
@@ -78,7 +79,6 @@ public class ActivitySendPresence extends AppCompatActivity {
     private String latitude;
     private String longitude;
 
-    private int spinnerSelectionTurn = 0;
     private String selectedCustomerId;
     private ArrayList<String> cusList;
     private ArrayList<String> cusCodeList;
@@ -87,12 +87,13 @@ public class ActivitySendPresence extends AppCompatActivity {
     private TextView promptTextView;
     private Spinner customerSpinner;
     private MaterialButton checkCustomerButton, panelSerialScanButton, batterySerialScanButton,
-            sendPresenceButton;
+            sendPresenceButton, logOutButton;
+    private MaterialToolbar toolbar;
 
     private RelativeLayout panelSerialLayout, batterySerialLayout, spinnerLayout;
     private TextInputEditText panelSerialInput, batterySerialInput;
 
-    private ImageButton spinnerButton, logOutButton;
+    private ImageButton spinnerButton;
     private View.OnClickListener spinnerOnclickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -102,18 +103,14 @@ public class ActivitySendPresence extends AppCompatActivity {
     private AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            if (spinnerSelectionTurn != 0) {
 
-                if (cusCodeList != null)
-                    selectedCustomerId = cusCodeList.get(position);
+            panelSerialLayout.setVisibility(View.VISIBLE);
+            batterySerialLayout.setVisibility(View.VISIBLE);
+            sendPresenceButton.setVisibility(View.VISIBLE);
+            promptTextView.setVisibility(View.GONE);
 
-                panelSerialLayout.setVisibility(View.VISIBLE);
-                batterySerialLayout.setVisibility(View.VISIBLE);
-                sendPresenceButton.setVisibility(View.VISIBLE);
-                promptTextView.setVisibility(View.GONE);
-            }
-
-            spinnerSelectionTurn += 1;
+            if (cusList != null)
+                selectedCustomerId = cusList.get(position);
 
             Log.d(TAG + " spinner", String.valueOf(position));
         }
@@ -257,6 +254,8 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         findElements();
 
+        setSupportActionBar(toolbar);
+
         getImeiNum();
         getLocation();
 
@@ -274,11 +273,18 @@ public class ActivitySendPresence extends AppCompatActivity {
     public void onBackPressed() {
         if (backPressTime + BACK_PRESS_TIME_INTERVAL > System.currentTimeMillis()) {
             super.onBackPressed();
+            sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false);
+            editor.apply();
+
+            finish();
             return;
         } else {
             Toast.makeText(
                     ActivitySendPresence.this,
-                    "Please press back again to exit",
+                    "Please press back again to logout and exit",
                     Toast.LENGTH_SHORT
             ).show();
         }
@@ -305,6 +311,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         spinnerButton = findViewById(R.id.presence_spinner_open_button);
         logOutButton = findViewById(R.id.presence_logout_button);
+        toolbar = findViewById(R.id.presence_toolbar);
     }
 
     void showDialog(String title, String message) {
@@ -326,7 +333,7 @@ public class ActivitySendPresence extends AppCompatActivity {
         String promptMessage = "Select a customer to continue or check again.";
         promptTextView.setText(promptMessage);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         customerSpinner.setAdapter(adapter);
@@ -341,13 +348,18 @@ public class ActivitySendPresence extends AppCompatActivity {
             // permission is already granted. Get the number
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             assert telephonyManager != null;
-            if (Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                imei_num = Settings.Secure.getString(
+                        getContentResolver(),
+                        Settings.Secure.ANDROID_ID
+                );
+            } else if (Build.VERSION.SDK_INT >= 26) {
                 imei_num = telephonyManager.getImei(0);
-                Log.i(TAG + " IMEI", imei_num);
             } else {
                 imei_num = telephonyManager.getDeviceId(0);
-                Log.i(TAG + " IMEI", imei_num);
             }
+
+            Log.i(TAG + " IMEI", imei_num);
 //            loadingDialog.dismissLoadingDialog();
         } else {
 //            loadingDialog.dismissLoadingDialog();
@@ -423,8 +435,8 @@ public class ActivitySendPresence extends AppCompatActivity {
                             try {
                                 JSONArray jsonArray = response.getJSONArray("CustomerInfo");
                                 int lenOfArray = jsonArray.length();
-                                cusList = new ArrayList<String>();
-                                cusCodeList = new ArrayList<String>();
+                                cusList = new ArrayList<>();
+                                cusCodeList = new ArrayList<>();
 
                                 for (int i = 0; i < lenOfArray; i++) {
                                     JSONObject object = jsonArray.getJSONObject(i);
@@ -464,7 +476,7 @@ public class ActivitySendPresence extends AppCompatActivity {
         queue.add(request);
     }
 
-    void sendPresence(String panelSerial, String batterySerial) {
+    void sendPresence(final String panelSerial, String batterySerial) {
         loadingDialog.startLoadingDialog("Sending presence information...");
 
         String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
@@ -492,6 +504,18 @@ public class ActivitySendPresence extends AppCompatActivity {
 
                                     iconDialog.startIconDialog("Presence successful",
                                             R.drawable.ic_check);
+
+                                    panelSerialInput.setText("");
+                                    batterySerialInput.setText("");
+
+                                    spinnerLayout.setVisibility(View.GONE);
+                                    panelSerialLayout.setVisibility(View.GONE);
+                                    batterySerialLayout.setVisibility(View.GONE);
+                                    sendPresenceButton.setVisibility(View.GONE);
+
+                                    String s = "Please check customers to continue";
+                                    promptTextView.setText(s);
+                                    promptTextView.setVisibility(View.VISIBLE);
                                     Log.d(TAG + " PRE SC", object.getString("MessageText"));
                                 } else {
                                     // presence not successful

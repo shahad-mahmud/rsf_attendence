@@ -1,186 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true">
+    android:alpha="01"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/activity_back">
 
-    <ImageButton
-        android:id="@+id/presence_logout_button"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/logout_button"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_logout" />
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/presence_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        app:title="Send Presence"
+        app:titleTextColor="@color/white">
 
-    <RelativeLayout
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/presence_logout_button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:text="@string/logout"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:iconGravity="end"
+            app:iconSize="40dp" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:animateLayoutChanges="true"
-        tools:ignore="RelativeOverlap,UselessParent">
-
-        <TextView
-            android:id="@+id/presence_prompt_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="@string/please_check_customers_to_continue" />
+        android:layout_centerInParent="true">
 
         <RelativeLayout
-            android:id="@+id/presence_spinner_holder"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/presence_prompt_text"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
-            android:animateLayoutChanges="true"
-            android:background="@drawable/curved_corner"
-            android:gravity="center"
-            android:padding="1dp"
-            android:visibility="gone">
+            android:animateLayoutChanges="true">
 
-            <Spinner
-                android:id="@+id/presence_spinner"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/presence_spinner_open_button"
-                android:background="@drawable/curved_corner_spinner"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:spinnerMode="dialog"
-                android:textAlignment="center" />
-
-            <ImageButton
-                android:id="@+id/presence_spinner_open_button"
+            <TextView
+                android:id="@+id/presence_prompt_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="@android:color/transparent"
-                android:padding="4dp"
-                android:contentDescription="@string/spinner_opener_button"
-                android:src="@drawable/ic_arrow_drop_down_circle_24" />
-        </RelativeLayout>
+                android:layout_centerHorizontal="true"
+                android:text="@string/please_check_customers_to_continue" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/presence_check_customer_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/presence_spinner_holder"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="24dp"
-            android:text="@string/check_customers" />
-
-        <RelativeLayout
-            android:id="@+id/presence_battery_serial_holder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/presence_check_customer_button"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:animateLayoutChanges="true"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/presence_panel_serial_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <RelativeLayout
+                android:id="@+id/presence_spinner_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/presence_panel_serial_scan_button"
+                android:layout_below="@id/presence_prompt_text"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:animateLayoutChanges="true"
+                android:background="@drawable/curved_corner"
+                android:gravity="center"
+                android:padding="1dp"
+                android:visibility="gone">
 
-                app:hintAnimationEnabled="true">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/presence_panel_serial_input"
+                <Spinner
+                    android:id="@+id/presence_spinner"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/panel_serial" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/presence_spinner_open_button"
+                    android:background="@drawable/curved_corner_spinner"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:spinnerMode="dialog"
+                    android:textAlignment="center" />
+
+                <ImageButton
+                    android:id="@+id/presence_spinner_open_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/spinner_opener_button"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_arrow_drop_down_circle_24" />
+            </RelativeLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/presence_panel_serial_scan_button"
-                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/presence_check_customer_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:minWidth="0dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:text="@string/scan"
-                android:textAllCaps="false" />
-        </RelativeLayout>
+                android:layout_below="@id/presence_spinner_holder"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="24dp"
+                android:text="@string/check_customers" />
 
-        <RelativeLayout
-            android:id="@+id/presence_panel_serial_holder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/presence_battery_serial_holder"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:animateLayoutChanges="true"
-            android:visibility="gone">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/presence_battery_serial_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <RelativeLayout
+                android:id="@+id/presence_battery_serial_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/presence_battery_serial_scan_button"
-                app:hintAnimationEnabled="true">
+                android:layout_below="@id/presence_check_customer_button"
+                android:layout_marginStart="32dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginRight="32dp"
+                android:animateLayoutChanges="true"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/presence_battery_serial_input"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/presence_panel_serial_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/battery_serial" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/presence_panel_serial_scan_button"
+
+                    app:hintAnimationEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/presence_panel_serial_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/panel_serial" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/presence_panel_serial_scan_button"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:minWidth="0dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="@string/scan"
+                    android:textAllCaps="false" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/presence_panel_serial_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/presence_battery_serial_holder"
+                android:layout_marginStart="32dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginRight="32dp"
+                android:animateLayoutChanges="true"
+                android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/presence_battery_serial_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/presence_battery_serial_scan_button"
+                    app:hintAnimationEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/presence_battery_serial_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/battery_serial" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/presence_battery_serial_scan_button"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:minWidth="0dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="@string/scan"
+                    android:textAllCaps="false" />
+            </RelativeLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/presence_battery_serial_scan_button"
-                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/presence_send_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:minWidth="0dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:text="@string/scan"
-                android:textAllCaps="false" />
+                android:layout_below="@id/presence_panel_serial_holder"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="24dp"
+                android:text="@string/send"
+                android:visibility="gone" />
         </RelativeLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/presence_send_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/presence_panel_serial_holder"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="24dp"
-            android:text="@string/send"
-            android:visibility="gone" />
-    </RelativeLayout>
+    </ScrollView>
 
 
 </RelativeLayout>

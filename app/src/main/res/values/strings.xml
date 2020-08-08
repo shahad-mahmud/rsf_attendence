@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RSF Attendence</string>
+    <string name="app_name">RSF Attendance</string>
     <!-- Strings used for fragments for navigation -->
 
     <string name="company_logo">Company Logo</string>
@@ -19,4 +19,5 @@
     <string name="okay">Okay</string>
     <string name="logout_button">Logout button</string>
     <string name="spinner_opener_button">spinner opener button</string>
+    <string name="logout">Logout</string>
 </resources>
