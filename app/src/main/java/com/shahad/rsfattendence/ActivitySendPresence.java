@@ -110,7 +110,7 @@ public class ActivitySendPresence extends AppCompatActivity {
             promptTextView.setVisibility(View.GONE);
 
             if (cusList != null)
-                selectedCustomerId = cusList.get(position);
+                selectedCustomerId = cusCodeList.get(position);
 
             Log.d(TAG + " spinner", String.valueOf(position));
         }

@@ -5,7 +5,9 @@ package com.shahad.rsfattendence;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -351,12 +353,14 @@ public class ActivityLogin extends AppCompatActivity {
                         if (response != null) {
                             Log.d(TAG + " Access Code", response.toString());
                         }
-                        loadingDialogAC.dismissLoadingDialog();
+                        dismissWithCheck(loadingDialogAC);
+//                        loadingDialogAC.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loadingDialogAC.dismissLoadingDialog();
+                dismissWithCheck(loadingDialogAC);
+//                loadingDialogAC.dismissLoadingDialog();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
             }
@@ -394,12 +398,14 @@ public class ActivityLogin extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }
-                        loadingDialogDeviceId.dismissLoadingDialog();
+                        dismissWithCheck(loadingDialogDeviceId);
+//                        loadingDialogDeviceId.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loadingDialogDeviceId.dismissLoadingDialog();
+                dismissWithCheck(loadingDialogDeviceId);
+//                loadingDialogDeviceId.dismissLoadingDialog();
                 error.printStackTrace();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
             }
@@ -471,12 +477,14 @@ public class ActivityLogin extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }
-                        loadingDialogLogin.dismissLoadingDialog();
+                        dismissWithCheck(loadingDialogLogin);
+//                        loadingDialogLogin.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loadingDialogLogin.dismissLoadingDialog();
+                dismissWithCheck(loadingDialogLogin);
+//                loadingDialogLogin.dismissLoadingDialog();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
             }
@@ -489,5 +497,34 @@ public class ActivityLogin extends AppCompatActivity {
         ));
 
         queue.add(request);
+    }
+
+    public void dismissWithCheck(LoadingDialog dialog) {
+        if (dialog != null) {
+            if (dialog.isShowing()) {
+
+                //get the Context object that was used to great the dialog
+                Context context = ((ContextWrapper) dialog.getContext()).getBaseContext();
+
+                // if the Context used here was an activity AND it hasn't been finished or destroyed
+                // then dismiss it
+                if (context instanceof Activity) {
+                    // Api >=17
+                    if (!((Activity) context).isFinishing() && !((Activity) context).isDestroyed()) {
+                        dismissWithTryCatch(dialog);
+                    }
+                } else
+                    // if the Context used wasn't an Activity, then dismiss it too
+                    dismissWithTryCatch(dialog);
+            }
+        }
+    }
+
+    public void dismissWithTryCatch(LoadingDialog dialog) {
+        try {
+            dialog.dismissLoadingDialog();
+        } catch (final Exception e) {
+            // Do nothing.
+        }
     }
 }
