@@ -3,6 +3,7 @@ package com.shahad.rsfattendence;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -62,6 +63,10 @@ public class ActivitySendPresence extends AppCompatActivity {
 
     private static final String SHARED_PREF_FILE_NAME = "sharedPrefForLogIn";
     private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
+    private static final String SHARED_PREF_KEY_LOGIN_TIME = "loginTime";
+
+    private static final int AUTO_LOGIN_DURATION = 1800000; // automatic login if last login time was
+    // less than 30 minutes.
     private static final int BACK_PRESS_TIME_INTERVAL = 2500; // time in milliseconds
 
     private static final int REQ_CODE_PANEL = 513;
@@ -588,5 +593,53 @@ public class ActivitySendPresence extends AppCompatActivity {
             default:
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "onResume call");
+
+        sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+        long lastLogTime = sharedPreferences.getLong(SHARED_PREF_KEY_LOGIN_TIME, 0);
+
+        if (!(System.currentTimeMillis() - lastLogTime < AUTO_LOGIN_DURATION &&
+                sharedPreferences.getBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false))) {
+            // session expired
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false);
+            editor.apply();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(ActivitySendPresence.this);
+
+            builder.setTitle("Session Expired")
+                    .setMessage("The current session has expired. Please login again!")
+                    .setCancelable(false)
+                    .setIcon(R.drawable.ic_cross)
+                    .setPositiveButton(
+                            "Okay",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(ActivitySendPresence.this, ActivityLogin.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                    )
+                    .setNegativeButton(
+                            "Cancel",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    finish();
+                                }
+                            }
+                    );
+
+            builder.create().show();
+        }
+
     }
 }
