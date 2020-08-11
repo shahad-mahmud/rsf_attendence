@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
-    android:background="@drawable/activity_back"
     android:layout_height="match_parent"
-    android:layout_centerVertical="false">
+    android:layout_centerVertical="false"
+    android:background="@drawable/activity_back">
 
 
     <ScrollView
@@ -86,7 +86,6 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/login_button"
-                style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
