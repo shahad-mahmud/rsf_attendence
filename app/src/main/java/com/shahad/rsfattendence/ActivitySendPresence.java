@@ -261,9 +261,6 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        getImeiNum();
-        getLocation();
-
         panelSerialScanButton.setOnClickListener(panelSerialScanListener);
         batterySerialScanButton.setOnClickListener(batterySerialScanListener);
 
@@ -333,15 +330,19 @@ public class ActivitySendPresence extends AppCompatActivity {
 
     void populateSpinner(ArrayList<String> list) {
 //        promptTextView.setVisibility(View.GONE);
-        spinnerLayout.setVisibility(View.VISIBLE);
+        if (list.size() > 0) {
+            spinnerLayout.setVisibility(View.VISIBLE);
 
-        String promptMessage = "Select a customer to continue or check again.";
-        promptTextView.setText(promptMessage);
+            String promptMessage = "Select a customer to continue or check again.";
+            promptTextView.setText(promptMessage);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        customerSpinner.setAdapter(adapter);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_item, list);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            customerSpinner.setAdapter(adapter);
+        } else {
+            iconDialog.startIconDialog("No Data Found", R.drawable.ic_cross);
+        }
     }
 
     @SuppressLint("HardwareIds")
@@ -375,7 +376,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     }
 
     private void getLocation() {
-//        loadingDialog.startLoadingDialog("Reading current location...");
+        final LoadingDialog loadingDialogLoc = new LoadingDialog(ActivitySendPresence.this);
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivitySendPresence.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -409,12 +410,19 @@ public class ActivitySendPresence extends AppCompatActivity {
                                         "lat: " + latitude
                                                 + "long: " + longitude
                                 );
+
+                                Toast.makeText(
+                                        ActivitySendPresence.this,
+                                        "Longitude: " + longitude +
+                                                "  Latitude: " + latitude,
+                                        Toast.LENGTH_LONG
+                                ).show();
                             }
-//                            loadingDialog.dismissLoadingDialog();
+                            loadingDialogLoc.dismissLoadingDialog();
                         }
                     }, Looper.getMainLooper());
         } else {
-//            loadingDialog.dismissLoadingDialog();
+            loadingDialogLoc.dismissLoadingDialog();
             //permission is not granted. Ask for permission
             showDialog("Permission not granted", "Permission to read Location is not " +
                     "granted. Please log in again with granting the permissions.");
@@ -598,6 +606,9 @@ public class ActivitySendPresence extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        getImeiNum();
+        getLocation();
 
         Log.d(TAG, "onResume call");
 

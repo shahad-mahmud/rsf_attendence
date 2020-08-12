@@ -87,6 +87,8 @@ public class ActivityLogin extends AppCompatActivity {
 
     private String deviceId;
 
+    private LoadingDialog loadingDialogLoc;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,11 +96,10 @@ public class ActivityLogin extends AppCompatActivity {
 
         queue = Volley.newRequestQueue(ActivityLogin.this);
         iconDialog = new IconDialog(ActivityLogin.this);
+        loadingDialogLoc = new LoadingDialog(ActivityLogin.this);
 
         // get all the elements
         getElements();
-        getPermissionsAndOthers();
-
 
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,6 +152,13 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        getPermissionsAndOthers();
+    }
+
+    @Override
     public void onBackPressed() {
         if (backPressTime + BACK_PRESS_TIME_INTERVAL > System.currentTimeMillis()) {
             super.onBackPressed();
@@ -198,7 +206,7 @@ public class ActivityLogin extends AppCompatActivity {
 
     @SuppressLint("HardwareIds")
     private void getImeiNum() {
-//        loadingDialog.startLoadingDialog("Getting IMEI number...");
+//        loadingDialogId.startLoadingDialog("Getting IMEI number...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivityLogin.this,
                 Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
@@ -212,15 +220,14 @@ public class ActivityLogin extends AppCompatActivity {
                 );
             } else if (Build.VERSION.SDK_INT >= 26) {
                 imei_num = telephonyManager.getImei(0);
-                //                loadingDialog.dismissLoadingDialog();
             } else {
                 imei_num = telephonyManager.getDeviceId(0);
-                //                loadingDialog.dismissLoadingDialog();
             }
             Log.i(TAG + " IMEI", imei_num);
+//            dismissWithCheck(loadingDialogId);
         } else {
             //permission is not granted. Ask for permission
-//            loadingDialog.dismissLoadingDialog();
+//            dismissWithCheck(loadingDialogId);
             ActivityCompat.requestPermissions(
                     ActivityLogin.this,
                     new String[]{Manifest.permission.READ_PHONE_STATE},
@@ -230,7 +237,7 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private void getLocation() {
-//        loadingDialog.startLoadingDialog("Reading current location...");
+        loadingDialogLoc.startLoadingDialog("Reading current location...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivityLogin.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -264,12 +271,19 @@ public class ActivityLogin extends AppCompatActivity {
                                         "lat: " + latitude
                                                 + "long: " + longitude
                                 );
+
+                                Toast.makeText(
+                                        ActivityLogin.this,
+                                        "Longitude: " + longitude +
+                                                "  Latitude: " + latitude,
+                                        Toast.LENGTH_LONG
+                                ).show();
                             }
-//                            loadingDialog.dismissLoadingDialog();
+                            dismissWithCheck(loadingDialogLoc);
                         }
                     }, Looper.getMainLooper());
         } else {
-//            loadingDialog.dismissLoadingDialog();
+            dismissWithCheck(loadingDialogLoc);
             //permission is not granted. Ask for permission
             ActivityCompat.requestPermissions(ActivityLogin.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC_PER

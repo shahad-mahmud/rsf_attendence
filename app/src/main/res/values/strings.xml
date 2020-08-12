@@ -20,4 +20,5 @@
     <string name="logout_button">Logout button</string>
     <string name="spinner_opener_button">spinner opener button</string>
     <string name="logout">Logout</string>
+    <string name="version">[Version 03.1.0.0]</string>
 </resources>
