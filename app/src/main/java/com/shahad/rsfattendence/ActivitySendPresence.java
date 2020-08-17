@@ -414,8 +414,8 @@ public class ActivitySendPresence extends AppCompatActivity {
 
                                 Toast.makeText(
                                         ActivitySendPresence.this,
-                                        "Longitude: " + longitude +
-                                                "  Latitude: " + latitude,
+                                        "Latitude: " + latitude +
+                                                " Longitude: " + longitude,
                                         Toast.LENGTH_LONG
                                 ).show();
                             }
@@ -494,7 +494,7 @@ public class ActivitySendPresence extends AppCompatActivity {
         request.setRetryPolicy(new DefaultRetryPolicy(
                 8000,
                 2,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                0.0f
         ));
 
         queue.add(request);

@@ -274,8 +274,8 @@ public class ActivityLogin extends AppCompatActivity {
 
                                 Toast.makeText(
                                         ActivityLogin.this,
-                                        "Longitude: " + longitude +
-                                                "  Latitude: " + latitude,
+                                        "Latitude: " + latitude +
+                                                " Longitude: " + longitude,
                                         Toast.LENGTH_LONG
                                 ).show();
                             }
