@@ -87,7 +87,7 @@ public class ActivityLogin extends AppCompatActivity {
 
     private String deviceId;
 
-    private LoadingDialog loadingDialogLoc;
+//    private LoadingDialog loadingDialogLoc;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,7 +96,7 @@ public class ActivityLogin extends AppCompatActivity {
 
         queue = Volley.newRequestQueue(ActivityLogin.this);
         iconDialog = new IconDialog(ActivityLogin.this);
-        loadingDialogLoc = new LoadingDialog(ActivityLogin.this);
+//        loadingDialogLoc = new LoadingDialog(ActivityLogin.this);
 
         // get all the elements
         getElements();
@@ -237,7 +237,7 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private void getLocation() {
-        loadingDialogLoc.startLoadingDialog("Reading current location...");
+//        loadingDialogLoc.startLoadingDialog("Reading current location...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivityLogin.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -279,11 +279,11 @@ public class ActivityLogin extends AppCompatActivity {
                                         Toast.LENGTH_LONG
                                 ).show();
                             }
-                            dismissWithCheck(loadingDialogLoc);
+//                            dismissWithCheck(loadingDialogLoc);
                         }
                     }, Looper.getMainLooper());
         } else {
-            dismissWithCheck(loadingDialogLoc);
+//            dismissWithCheck(loadingDialogLoc);
             //permission is not granted. Ask for permission
             ActivityCompat.requestPermissions(ActivityLogin.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC_PER

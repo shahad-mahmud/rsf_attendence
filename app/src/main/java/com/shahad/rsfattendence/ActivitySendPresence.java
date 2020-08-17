@@ -376,7 +376,8 @@ public class ActivitySendPresence extends AppCompatActivity {
     }
 
     private void getLocation() {
-        final LoadingDialog loadingDialogLoc = new LoadingDialog(ActivitySendPresence.this);
+//        final LoadingDialog loadingDialogLoc = new LoadingDialog(ActivitySendPresence.this);
+//        loadingDialogLoc.startLoadingDialog("Reading current location...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivitySendPresence.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -418,11 +419,11 @@ public class ActivitySendPresence extends AppCompatActivity {
                                         Toast.LENGTH_LONG
                                 ).show();
                             }
-                            loadingDialogLoc.dismissLoadingDialog();
+//                            loadingDialogLoc.dismissLoadingDialog();
                         }
                     }, Looper.getMainLooper());
         } else {
-            loadingDialogLoc.dismissLoadingDialog();
+//            loadingDialogLoc.dismissLoadingDialog();
             //permission is not granted. Ask for permission
             showDialog("Permission not granted", "Permission to read Location is not " +
                     "granted. Please log in again with granting the permissions.");
@@ -451,17 +452,27 @@ public class ActivitySendPresence extends AppCompatActivity {
                                 cusList = new ArrayList<>();
                                 cusCodeList = new ArrayList<>();
 
+                                String message = "";
+
                                 for (int i = 0; i < lenOfArray; i++) {
                                     JSONObject object = jsonArray.getJSONObject(i);
                                     String temp = object.getString("CustomerName");
                                     String tempCode = object.getString("CustomerCode");
+                                    String code = object.getString("MessageCode");
+                                    message = object.getString("MessageText");
 
+                                    if (code.equals("200")) {
+                                        cusList.add(temp);
+                                        cusCodeList.add(tempCode);
+                                    }
                                     Log.d(TAG + " cus Str", temp);
-                                    cusList.add(temp);
-                                    cusCodeList.add(tempCode);
                                 }
 
-                                populateSpinner(cusList);
+                                if (cusList.size() > 0) {
+                                    populateSpinner(cusList);
+                                } else {
+                                    iconDialog.startIconDialog(message, R.drawable.ic_cross);
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -475,14 +486,14 @@ public class ActivitySendPresence extends AppCompatActivity {
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
                 loadingDialog.dismissLoadingDialog();
-                showDialog("Error", "Error occurred while fetching the customer" +
-                        " list. Please try again.");
+                showDialog("Result", "No location or customer found this time. " +
+                        "Please try again after a while.");
             }
         });
 
         request.setRetryPolicy(new DefaultRetryPolicy(
-                10000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                8000,
+                2,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
 
@@ -549,8 +560,8 @@ public class ActivitySendPresence extends AppCompatActivity {
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
                 loadingDialog.dismissLoadingDialog();
-                showDialog("Error", "Error occurred while sending presence information. " +
-                        "Please try again.");
+                showDialog("Request time out", "The server took too long to respond. Please check" +
+                        " your internet connection and try again.");
             }
         });
 
