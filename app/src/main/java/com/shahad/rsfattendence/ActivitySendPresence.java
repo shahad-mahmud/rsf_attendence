@@ -193,13 +193,18 @@ public class ActivitySendPresence extends AppCompatActivity {
                 @Override
                 public void accept(Boolean internet) {
                     if (internet) {
-                        if (imei_num != null && latitude != null && longitude != null) {
-                            getCustomers();
-                        } else {
-                            showDialog("Error!", "Ops! Can not read the IMEI " +
-                                    "number or Location. Please try again.");
+                        if (imei_num == null || imei_num.equals("")) {
+                            iconDialog.startIconDialog("Ops! Can not read the IMEI number. " +
+                                    "Please try again.", R.drawable.ic_mobile_cross);
                             getImeiNum();
+                        } else if (latitude == null || latitude.equals("")
+                                || longitude == null || longitude.equals("")) {
+                            iconDialog.startIconDialog("Ops! Can not read Location " +
+                                    "information. Pleas try again!", R.drawable.ic_location);
                             getLocation();
+                        } else if (imei_num != null && latitude != null && longitude != null) {
+                            getCustomers();
+                            checkCustomerButton.setClickable(false);
                         }
                     } else {
                         showDialog("No internet", "Ops! Internet is not available. Please connect to the " +
@@ -471,6 +476,8 @@ public class ActivitySendPresence extends AppCompatActivity {
                                 if (cusList.size() > 0) {
                                     populateSpinner(cusList);
                                 } else {
+                                    if (message.equals("") || message == null)
+                                        message = "No output result found.";
                                     iconDialog.startIconDialog(message, R.drawable.ic_cross);
                                 }
                             } catch (JSONException e) {
@@ -479,6 +486,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
                         }
                         loadingDialog.dismissLoadingDialog();
+                        checkCustomerButton.setClickable(true);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -486,17 +494,20 @@ public class ActivitySendPresence extends AppCompatActivity {
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
                 loadingDialog.dismissLoadingDialog();
+                checkCustomerButton.setClickable(true);
                 showDialog("Result", "No location or customer found this time. " +
                         "Please try again after a while.");
+
             }
         });
 
         request.setRetryPolicy(new DefaultRetryPolicy(
-                8000,
-                2,
-                0.0f
+                15000,
+                1,
+                0
         ));
 
+        Log.d(TAG + " timeout", String.valueOf(request.getTimeoutMs()));
         queue.add(request);
     }
 
