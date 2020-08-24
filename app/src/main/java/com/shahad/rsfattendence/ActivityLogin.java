@@ -121,6 +121,7 @@ public class ActivityLogin extends AppCompatActivity {
 
                                 if (latitude != null && longitude != null) {
                                     performLogin(imei_num, user_id, pass, latitude, longitude);
+                                    login_button.setClickable(false);
                                 } else {
                                     iconDialog.startIconDialog("Ops! Can not read Location " +
                                             "information. Pleas try again!", R.drawable.ic_location);
@@ -492,12 +493,14 @@ public class ActivityLogin extends AppCompatActivity {
                             }
                         }
                         dismissWithCheck(loadingDialogLogin);
+                        login_button.setClickable(true);
 //                        loadingDialogLogin.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 dismissWithCheck(loadingDialogLogin);
+                login_button.setClickable(true);
 //                loadingDialogLogin.dismissLoadingDialog();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();

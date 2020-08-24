@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -71,7 +72,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
     private static final int REQ_CODE_PANEL = 513;
     private static final int REQ_CODE_BATTERY = 500;
-    SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
     private long backPressTime;
 
     private RequestQueue queue;
@@ -102,6 +103,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private View.OnClickListener spinnerOnclickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            updateSessionLastActiveTime();
             customerSpinner.performClick();
         }
     };
@@ -129,6 +131,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private View.OnClickListener panelSerialScanListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            updateSessionLastActiveTime();
             Intent intent = new Intent(ActivitySendPresence.this, ActivityScanner.class);
             startActivityForResult(intent, REQ_CODE_PANEL);
         }
@@ -137,6 +140,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private View.OnClickListener batterySerialScanListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            updateSessionLastActiveTime();
             Intent intent = new Intent(ActivitySendPresence.this, ActivityScanner.class);
             startActivityForResult(intent, REQ_CODE_BATTERY);
         }
@@ -144,6 +148,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private View.OnClickListener sendPresenceOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            updateSessionLastActiveTime();
             //check internet
             new InternetCheck(new InternetCheck.Consumer() {
                 @Override
@@ -163,9 +168,10 @@ public class ActivitySendPresence extends AppCompatActivity {
                             if (selectedCustomerId == null)
                                 isOk = false;
 
-                            if (isOk)
+                            if (isOk) {
                                 sendPresence(panelSerial, batterySerial);
-                            else
+                                sendPresenceButton.setClickable(false);
+                            } else
                                 Toast.makeText(
                                         ActivitySendPresence.this,
                                         "Can not send presence. Please try again",
@@ -188,6 +194,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private View.OnClickListener customerCheckOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            updateSessionLastActiveTime();
             //check internet
             new InternetCheck(new InternetCheck.Consumer() {
                 @Override
@@ -220,6 +227,7 @@ public class ActivitySendPresence extends AppCompatActivity {
         public void onClick(View v) {
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(ActivitySendPresence.this);
             String message = "Are you sure to logout?";
+            updateSessionLastActiveTime();
 
             builder.setCancelable(true)
                     .setMessage(message)
@@ -537,7 +545,7 @@ public class ActivitySendPresence extends AppCompatActivity {
                                 if (object.getString("MessageCode").equals("200")) {
                                     // presence successful
 
-                                    iconDialog.startIconDialog("Presence successful",
+                                    iconDialog.startIconDialog("In/Out Presence Successful. Thanks",
                                             R.drawable.ic_check);
 
                                     panelSerialInput.setText("");
@@ -564,6 +572,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
                         }
                         loadingDialog.dismissLoadingDialog();
+                        sendPresenceButton.setClickable(true);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -571,6 +580,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
                 loadingDialog.dismissLoadingDialog();
+                sendPresenceButton.setClickable(true);
                 showDialog("Request time out", "The server took too long to respond. Please check" +
                         " your internet connection and try again.");
             }
@@ -631,6 +641,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         getImeiNum();
         getLocation();
+        updateSessionLastActiveTime();
 
         Log.d(TAG, "onResume call");
 
@@ -674,5 +685,21 @@ public class ActivitySendPresence extends AppCompatActivity {
             builder.create().show();
         }
 
+    }
+
+    private void updateSessionLastActiveTime() {
+        sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putLong(SHARED_PREF_KEY_LOGIN_TIME, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.d(TAG + "TCH", "touched");
+        updateSessionLastActiveTime();
+
+        return super.onTouchEvent(event);
     }
 }
