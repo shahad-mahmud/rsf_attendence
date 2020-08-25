@@ -87,6 +87,8 @@ public class ActivityLogin extends AppCompatActivity {
 
     private String deviceId;
 
+    private long lastLogButtonClickTime = 0;
+
 //    private LoadingDialog loadingDialogLoc;
 
     @Override
@@ -100,10 +102,16 @@ public class ActivityLogin extends AppCompatActivity {
 
         // get all the elements
         getElements();
-
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (System.currentTimeMillis() - lastLogButtonClickTime < 1500) {
+                    Log.d(TAG + "click", "Fast click");
+                    return;
+                }
+
+                lastLogButtonClickTime = System.currentTimeMillis();
 
                 // get user name input and password
                 final String user_id = Objects.requireNonNull(user_id_input.getText()).toString();

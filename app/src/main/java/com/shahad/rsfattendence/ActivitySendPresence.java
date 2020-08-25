@@ -145,9 +145,17 @@ public class ActivitySendPresence extends AppCompatActivity {
             startActivityForResult(intent, REQ_CODE_BATTERY);
         }
     };
+
+    private long lastPresenceButtonClickTime = 0;
     private View.OnClickListener sendPresenceOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (System.currentTimeMillis() - lastPresenceButtonClickTime < 1500) {
+                Log.d(TAG, "Fast click");
+                return;
+            }
+            lastPresenceButtonClickTime = System.currentTimeMillis();
+
             updateSessionLastActiveTime();
             //check internet
             new InternetCheck(new InternetCheck.Consumer() {
@@ -191,9 +199,17 @@ public class ActivitySendPresence extends AppCompatActivity {
             });
         }
     };
+
+    private long lastCusButtonClickTime = 0;
     private View.OnClickListener customerCheckOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (System.currentTimeMillis() - lastCusButtonClickTime < 1500) {
+                Log.d(TAG, "Fast click");
+                return;
+            }
+            lastCusButtonClickTime = System.currentTimeMillis();
+
             updateSessionLastActiveTime();
             //check internet
             new InternetCheck(new InternetCheck.Consumer() {
@@ -697,7 +713,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d(TAG + "TCH", "touched");
+//        Log.d(TAG + "TCH", "touched");
         updateSessionLastActiveTime();
 
         return super.onTouchEvent(event);
