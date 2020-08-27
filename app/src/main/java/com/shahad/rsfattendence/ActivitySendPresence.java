@@ -66,7 +66,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
     private static final String SHARED_PREF_KEY_LOGIN_TIME = "loginTime";
 
-    private static final int AUTO_LOGIN_DURATION = 1800000; // automatic login if last login time was
+    private static final int AUTO_LOGIN_DURATION = 30 * 60 * 1000; // automatic login if last login time was
     // less than 30 minutes.
     private static final int BACK_PRESS_TIME_INTERVAL = 2500; // time in milliseconds
 
@@ -657,12 +657,13 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         getImeiNum();
         getLocation();
-        updateSessionLastActiveTime();
 
         Log.d(TAG, "onResume call");
 
         sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE);
         long lastLogTime = sharedPreferences.getLong(SHARED_PREF_KEY_LOGIN_TIME, 0);
+
+//        Log.d(TAG, "Last login time: " + lastLogTime);
 
         if (!(System.currentTimeMillis() - lastLogTime < AUTO_LOGIN_DURATION &&
                 sharedPreferences.getBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false))) {
@@ -699,8 +700,9 @@ public class ActivitySendPresence extends AppCompatActivity {
                     );
 
             builder.create().show();
+        } else {
+            updateSessionLastActiveTime();
         }
-
     }
 
     private void updateSessionLastActiveTime() {
@@ -709,6 +711,9 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         editor.putLong(SHARED_PREF_KEY_LOGIN_TIME, System.currentTimeMillis());
         editor.apply();
+
+//        Log.d(TAG+"TIME", "time updated: " +
+//                sharedPreferences.getLong(SHARED_PREF_KEY_LOGIN_TIME, 0));
     }
 
     @Override
