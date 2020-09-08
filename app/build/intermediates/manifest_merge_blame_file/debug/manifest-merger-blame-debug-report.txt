@@ -35,7 +35,7 @@
 21        android:allowBackup="true"
 21-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:15:9-35
 22        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-22-->[androidx.core:core:1.3.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/881ed38d8f80da7a88cb010386d80aa8/core-1.3.0/AndroidManifest.xml:24:18-86
+22-->[androidx.core:core:1.3.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/429fb715fcc7711d4ab133e350b6f531/core-1.3.0/AndroidManifest.xml:24:18-86
 23        android:debuggable="true"
 24        android:extractNativeLibs="false"
 25        android:fullBackupContent="true"
@@ -48,59 +48,58 @@
 28-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:19:9-54
 29        android:supportsRtl="true"
 29-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:20:9-35
-30        android:testOnly="true"
-31        android:theme="@style/AppTheme" >
-31-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:21:9-40
-32        <meta-data
-32-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:23:9-25:39
-33            android:name="com.google.android.gms.vision.DEPENDENCIES"
-33-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:24:13-70
-34            android:value="barcode" />
-34-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:25:13-36
-35
-36        <activity
-36-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:27:9-36:20
-37            android:name="com.shahad.rsfattendence.MainActivity"
-37-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:28:13-41
-38            android:label="@string/app_name"
-38-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:29:13-45
-39            android:theme="@style/SplashTheme" >
-39-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:30:13-47
-40            <intent-filter>
-40-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:31:13-35:29
-41                <action android:name="android.intent.action.MAIN" />
-41-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:32:17-69
-41-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:32:25-66
-42
-43                <category android:name="android.intent.category.LAUNCHER" />
-43-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:34:17-77
-43-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:34:27-74
-44            </intent-filter>
-45        </activity>
-46        <activity android:name="com.shahad.rsfattendence.ActivityLogin" />
-46-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:37:9-51
-46-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:37:19-48
-47        <activity android:name="com.shahad.rsfattendence.ActivitySendPresence" />
-47-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:38:9-57
-47-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:38:19-55
-48        <activity android:name="com.shahad.rsfattendence.ActivityScanner" />
-48-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:39:9-53
-48-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:39:19-50
-49        <activity
-49-->[com.google.android.gms:play-services-base:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/6a27f052584ba14e1bf3f0754d910342/jetified-play-services-base-17.0.0/AndroidManifest.xml:23:9-26:75
-50            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-50-->[com.google.android.gms:play-services-base:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/6a27f052584ba14e1bf3f0754d910342/jetified-play-services-base-17.0.0/AndroidManifest.xml:24:13-79
-51            android:exported="false"
-51-->[com.google.android.gms:play-services-base:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/6a27f052584ba14e1bf3f0754d910342/jetified-play-services-base-17.0.0/AndroidManifest.xml:25:13-37
-52            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-52-->[com.google.android.gms:play-services-base:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/6a27f052584ba14e1bf3f0754d910342/jetified-play-services-base-17.0.0/AndroidManifest.xml:26:13-72
-53
-54        <meta-data
-54-->[com.google.android.gms:play-services-basement:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/85cfff5691f363e5417071a3d3b6c15f/jetified-play-services-basement-17.0.0/AndroidManifest.xml:23:9-25:69
-55            android:name="com.google.android.gms.version"
-55-->[com.google.android.gms:play-services-basement:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/85cfff5691f363e5417071a3d3b6c15f/jetified-play-services-basement-17.0.0/AndroidManifest.xml:24:13-58
-56            android:value="@integer/google_play_services_version" />
-56-->[com.google.android.gms:play-services-basement:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/85cfff5691f363e5417071a3d3b6c15f/jetified-play-services-basement-17.0.0/AndroidManifest.xml:25:13-66
-57    </application>
-58
-59</manifest>
+30        android:theme="@style/AppTheme" >
+30-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:21:9-40
+31        <meta-data
+31-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:23:9-25:39
+32            android:name="com.google.android.gms.vision.DEPENDENCIES"
+32-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:24:13-70
+33            android:value="barcode" />
+33-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:25:13-36
+34
+35        <activity
+35-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:27:9-36:20
+36            android:name="com.shahad.rsfattendence.MainActivity"
+36-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:28:13-41
+37            android:label="@string/app_name"
+37-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:29:13-45
+38            android:theme="@style/SplashTheme" >
+38-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:30:13-47
+39            <intent-filter>
+39-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:31:13-35:29
+40                <action android:name="android.intent.action.MAIN" />
+40-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:32:17-69
+40-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:32:25-66
+41
+42                <category android:name="android.intent.category.LAUNCHER" />
+42-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:34:17-77
+42-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:34:27-74
+43            </intent-filter>
+44        </activity>
+45        <activity android:name="com.shahad.rsfattendence.ActivityLogin" />
+45-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:37:9-51
+45-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:37:19-48
+46        <activity android:name="com.shahad.rsfattendence.ActivitySendPresence" />
+46-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:38:9-58
+46-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:38:19-55
+47        <activity android:name="com.shahad.rsfattendence.ActivityScanner" />
+47-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:39:9-53
+47-->/media/shahad/Extra/AndroidStudioProjects/RSFAttendence/app/src/main/AndroidManifest.xml:39:19-50
+48        <activity
+48-->[com.google.android.gms:play-services-base:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/a1794986c7a3c4986f9feb2359005476/jetified-play-services-base-17.0.0/AndroidManifest.xml:23:9-26:75
+49            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+49-->[com.google.android.gms:play-services-base:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/a1794986c7a3c4986f9feb2359005476/jetified-play-services-base-17.0.0/AndroidManifest.xml:24:13-79
+50            android:exported="false"
+50-->[com.google.android.gms:play-services-base:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/a1794986c7a3c4986f9feb2359005476/jetified-play-services-base-17.0.0/AndroidManifest.xml:25:13-37
+51            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+51-->[com.google.android.gms:play-services-base:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/a1794986c7a3c4986f9feb2359005476/jetified-play-services-base-17.0.0/AndroidManifest.xml:26:13-72
+52
+53        <meta-data
+53-->[com.google.android.gms:play-services-basement:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/294cc5ecc9001f3e94c034cd71f64fdf/jetified-play-services-basement-17.0.0/AndroidManifest.xml:23:9-25:69
+54            android:name="com.google.android.gms.version"
+54-->[com.google.android.gms:play-services-basement:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/294cc5ecc9001f3e94c034cd71f64fdf/jetified-play-services-basement-17.0.0/AndroidManifest.xml:24:13-58
+55            android:value="@integer/google_play_services_version" />
+55-->[com.google.android.gms:play-services-basement:17.0.0] /home/shahad/.gradle/caches/transforms-2/files-2.1/294cc5ecc9001f3e94c034cd71f64fdf/jetified-play-services-basement-17.0.0/AndroidManifest.xml:25:13-66
+56    </application>
+57
+58</manifest>

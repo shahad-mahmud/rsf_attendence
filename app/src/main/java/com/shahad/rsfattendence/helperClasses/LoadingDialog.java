@@ -1,6 +1,7 @@
 package com.shahad.rsfattendence.helperClasses;
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -41,4 +42,13 @@ public class LoadingDialog {
     public void dismissLoadingDialog() {
         dialogs.dismiss();
     }
+
+    public boolean isShowing() {
+        return dialogs.isShowing();
+    }
+
+    public Context getContext() {
+        return dialogs.getContext();
+    }
+
 }

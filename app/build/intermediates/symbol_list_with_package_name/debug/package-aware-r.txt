@@ -222,6 +222,10 @@ attr circleCrop
 attr circleRadius
 attr circularInset
 attr circularRadius
+attr civ_border_color
+attr civ_border_overlay
+attr civ_border_width
+attr civ_circle_background_color
 attr clickAction
 attr closeIcon
 attr closeIconEnabled
@@ -953,9 +957,10 @@ color abc_background_cache_hint_selector_material_light
 color abc_btn_colored_borderless_text_material
 color abc_btn_colored_text_material
 color abc_color_highlight_material
+color abc_decor_view_status_guard
+color abc_decor_view_status_guard_light
 color abc_hint_foreground_material_dark
 color abc_hint_foreground_material_light
-color abc_input_method_navigation_guard
 color abc_primary_text_disable_only_material_dark
 color abc_primary_text_disable_only_material_light
 color abc_primary_text_material_dark
@@ -976,6 +981,7 @@ color accent_material_dark
 color accent_material_light
 color androidx_core_ripple_material_light
 color androidx_core_secondary_text_default_material_light
+color back_color
 color background_floating_material_dark
 color background_floating_material_light
 color background_material_dark
@@ -1057,6 +1063,7 @@ color foreground_material_light
 color grey
 color highlighted_text_material_dark
 color highlighted_text_material_light
+color ic_launcher_background
 color material_blue_grey_800
 color material_blue_grey_900
 color material_blue_grey_950
@@ -1617,6 +1624,8 @@ drawable abc_textfield_search_activated_mtrl_alpha
 drawable abc_textfield_search_default_mtrl_alpha
 drawable abc_textfield_search_material
 drawable abc_vector_test
+drawable activity_back
+drawable avatar
 drawable avd_hide_password
 drawable avd_show_password
 drawable btn_checkbox_checked_mtrl
@@ -1627,6 +1636,7 @@ drawable btn_radio_off_mtrl
 drawable btn_radio_off_to_on_mtrl_animation
 drawable btn_radio_on_mtrl
 drawable btn_radio_on_to_off_mtrl_animation
+drawable cloud_avatar
 drawable common_full_open_on_phone
 drawable common_google_signin_btn_icon_dark
 drawable common_google_signin_btn_icon_dark_focused
@@ -1668,6 +1678,7 @@ drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_location
 drawable ic_lock
+drawable ic_logout
 drawable ic_mobile_cross
 drawable ic_mtrl_checked_circle
 drawable ic_mtrl_chip_checked_black
@@ -2006,6 +2017,8 @@ id presence_battery_serial_input
 id presence_battery_serial_layout
 id presence_battery_serial_scan_button
 id presence_check_customer_button
+id presence_image
+id presence_logout_button
 id presence_panel_serial_holder
 id presence_panel_serial_input
 id presence_panel_serial_layout
@@ -2015,6 +2028,7 @@ id presence_send_button
 id presence_spinner
 id presence_spinner_holder
 id presence_spinner_open_button
+id presence_toolbar
 id progress_circular
 id progress_horizontal
 id radio
@@ -2037,6 +2051,7 @@ id scroll
 id scrollIndicatorDown
 id scrollIndicatorUp
 id scrollView
+id scrollView2
 id scrollable
 id search_badge
 id search_bar
@@ -2293,6 +2308,7 @@ layout text_view_with_line_height_from_style
 layout text_view_with_theme_line_height
 layout text_view_without_line_height
 mipmap ic_launcher
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 plurals mtrl_badge_content_description
 string abc_action_bar_home_description
@@ -2362,6 +2378,8 @@ string icon_content_description
 string item_view_role_description
 string loading
 string login_button
+string logout
+string logout_button
 string material_clock_display_divider
 string material_clock_toggle_content_description
 string material_hour_selection
@@ -2424,8 +2442,10 @@ string please_check_customers_to_continue
 string scan
 string search_menu_title
 string send
+string spinner_opener_button
 string status_bar_notification_info_overflow
 string user_id
+string version
 string version_num
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light
@@ -2830,6 +2850,7 @@ style Theme_AppCompat_Dialog
 style Theme_AppCompat_Dialog_Alert
 style Theme_AppCompat_Dialog_MinWidth
 style Theme_AppCompat_DialogWhenLarge
+style Theme_AppCompat_Empty
 style Theme_AppCompat_Light
 style Theme_AppCompat_Light_DarkActionBar
 style Theme_AppCompat_Light_Dialog
@@ -3159,6 +3180,7 @@ styleable ButtonBarLayout allowStacking
 styleable CardView android_minWidth android_minHeight cardBackgroundColor cardCornerRadius cardElevation cardMaxElevation cardPreventCornerOverlap cardUseCompatPadding contentPadding contentPaddingBottom contentPaddingLeft contentPaddingRight contentPaddingTop
 styleable Chip android_textAppearance android_textSize android_textColor android_ellipsize android_maxWidth android_text android_checkable checkedIcon checkedIconEnabled checkedIconTint checkedIconVisible chipBackgroundColor chipCornerRadius chipEndPadding chipIcon chipIconEnabled chipIconSize chipIconTint chipIconVisible chipMinHeight chipMinTouchTargetSize chipStartPadding chipStrokeColor chipStrokeWidth chipSurfaceColor closeIcon closeIconEnabled closeIconEndPadding closeIconSize closeIconStartPadding closeIconTint closeIconVisible ensureMinTouchTargetSize hideMotionSpec iconEndPadding iconStartPadding rippleColor shapeAppearance shapeAppearanceOverlay showMotionSpec textEndPadding textStartPadding
 styleable ChipGroup checkedChip chipSpacing chipSpacingHorizontal chipSpacingVertical selectionRequired singleLine singleSelection
+styleable CircleImageView civ_border_color civ_border_overlay civ_border_width civ_circle_background_color
 styleable ClockFaceView valueTextColor
 styleable ClockHandView materialCircleRadius selectorSize
 styleable CollapsingToolbarLayout collapsedTitleGravity collapsedTitleTextAppearance contentScrim expandedTitleGravity expandedTitleMargin expandedTitleMarginBottom expandedTitleMarginEnd expandedTitleMarginStart expandedTitleMarginTop expandedTitleTextAppearance maxLines scrimAnimationDuration scrimVisibleHeightTrigger statusBarScrim title titleEnabled toolbarId

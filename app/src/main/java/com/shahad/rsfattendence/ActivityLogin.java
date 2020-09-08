@@ -5,13 +5,17 @@ package com.shahad.rsfattendence;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +39,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.shahad.rsfattendence.helperClasses.IconDialog;
 import com.shahad.rsfattendence.helperClasses.InternetCheck;
@@ -57,13 +60,21 @@ public class ActivityLogin extends AppCompatActivity {
     private static final String SERVICE_ACCESS_USER_NAME = "RSFWSA";
     private static final String SERVICE_ACCESS_CODE = "abcd12345";
 
+    private static final String SHARED_PREF_FILE_NAME = "sharedPrefForLogIn";
+    private static final String SHARED_PREF_KEY_USER_ID = "userId";
+    private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
+    private static final String SHARED_PREF_KEY_LOGIN_TIME = "loginTime";
+
+    SharedPreferences sharedPreferences;
+
     private static final int REQ_PHN_STATE_PER = 936;
-    private static final int REQ_INTERNET_PER = 711;
     private static final int REQ_LOC_PER = 345;
     private static final int REQ_ALL_PER = 11;
 
+    private static final int BACK_PRESS_TIME_INTERVAL = 2500; // time in milliseconds
+    private long backPressTime;
+
     private IconDialog iconDialog;
-    private LoadingDialog loadingDialog;
 
     private TextInputEditText user_id_input, user_pass_input;
     private MaterialButton login_button;
@@ -75,7 +86,10 @@ public class ActivityLogin extends AppCompatActivity {
     private String longitude;
 
     private String deviceId;
-    private MaterialAlertDialogBuilder dialogBuilder;
+
+    private long lastLogButtonClickTime = 0;
+
+//    private LoadingDialog loadingDialogLoc;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,18 +97,21 @@ public class ActivityLogin extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         queue = Volley.newRequestQueue(ActivityLogin.this);
-        dialogBuilder = new MaterialAlertDialogBuilder(ActivityLogin.this);
         iconDialog = new IconDialog(ActivityLogin.this);
-        loadingDialog = new LoadingDialog(ActivityLogin.this);
+//        loadingDialogLoc = new LoadingDialog(ActivityLogin.this);
 
         // get all the elements
         getElements();
-        getPermissionsAndOthers();
-
-
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (System.currentTimeMillis() - lastLogButtonClickTime < 1500) {
+                    Log.d(TAG + "click", "Fast click");
+                    return;
+                }
+
+                lastLogButtonClickTime = System.currentTimeMillis();
 
                 // get user name input and password
                 final String user_id = Objects.requireNonNull(user_id_input.getText()).toString();
@@ -112,6 +129,7 @@ public class ActivityLogin extends AppCompatActivity {
 
                                 if (latitude != null && longitude != null) {
                                     performLogin(imei_num, user_id, pass, latitude, longitude);
+                                    login_button.setClickable(false);
                                 } else {
                                     iconDialog.startIconDialog("Ops! Can not read Location " +
                                             "information. Pleas try again!", R.drawable.ic_location);
@@ -131,6 +149,38 @@ public class ActivityLogin extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (sharedPreferences == null)
+            sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, Context.MODE_PRIVATE);
+        String uName = sharedPreferences.getString(SHARED_PREF_KEY_USER_ID, "");
+        user_id_input.setText(uName);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        getPermissionsAndOthers();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (backPressTime + BACK_PRESS_TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed();
+            return;
+        } else {
+            Toast.makeText(
+                    ActivityLogin.this,
+                    "Please press back again to exit",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+
+        backPressTime = System.currentTimeMillis();
     }
 
     private void getElements() {
@@ -165,25 +215,28 @@ public class ActivityLogin extends AppCompatActivity {
 
     @SuppressLint("HardwareIds")
     private void getImeiNum() {
-//        loadingDialog.startLoadingDialog("Getting IMEI number...");
+//        loadingDialogId.startLoadingDialog("Getting IMEI number...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivityLogin.this,
                 Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             // permission is already granted. Get the number
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             assert telephonyManager != null;
-            if (Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                imei_num = Settings.Secure.getString(
+                        getContentResolver(),
+                        Settings.Secure.ANDROID_ID
+                );
+            } else if (Build.VERSION.SDK_INT >= 26) {
                 imei_num = telephonyManager.getImei(0);
-                Log.i(TAG + " IMEI", imei_num);
-//                loadingDialog.dismissLoadingDialog();
             } else {
                 imei_num = telephonyManager.getDeviceId(0);
-                Log.i(TAG + " IMEI", imei_num);
-//                loadingDialog.dismissLoadingDialog();
             }
+            Log.i(TAG + " IMEI", imei_num);
+//            dismissWithCheck(loadingDialogId);
         } else {
             //permission is not granted. Ask for permission
-//            loadingDialog.dismissLoadingDialog();
+//            dismissWithCheck(loadingDialogId);
             ActivityCompat.requestPermissions(
                     ActivityLogin.this,
                     new String[]{Manifest.permission.READ_PHONE_STATE},
@@ -193,7 +246,7 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private void getLocation() {
-//        loadingDialog.startLoadingDialog("Reading current location...");
+//        loadingDialogLoc.startLoadingDialog("Reading current location...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivityLogin.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -227,26 +280,24 @@ public class ActivityLogin extends AppCompatActivity {
                                         "lat: " + latitude
                                                 + "long: " + longitude
                                 );
+
+                                Toast.makeText(
+                                        ActivityLogin.this,
+                                        "Latitude: " + latitude +
+                                                " Longitude: " + longitude,
+                                        Toast.LENGTH_LONG
+                                ).show();
                             }
-//                            loadingDialog.dismissLoadingDialog();
+//                            dismissWithCheck(loadingDialogLoc);
                         }
                     }, Looper.getMainLooper());
         } else {
-//            loadingDialog.dismissLoadingDialog();
+//            dismissWithCheck(loadingDialogLoc);
             //permission is not granted. Ask for permission
             ActivityCompat.requestPermissions(ActivityLogin.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQ_LOC_PER
             );
         }
-    }
-
-    private void showDialog(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", okListener)
-                .create()
-                .show();
     }
 
     @Override
@@ -288,19 +339,22 @@ public class ActivityLogin extends AppCompatActivity {
                             Manifest.permission.READ_PHONE_STATE)
                             || ActivityCompat.shouldShowRequestPermissionRationale(
                             this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        showDialog("Phone state and Location Services Permissions required for this app to continue",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        switch (which) {
-                                            case DialogInterface.BUTTON_POSITIVE:
+
+                        new AlertDialog.Builder(this)
+                                .setMessage("Phone state and Location Services Permissions required " +
+                                        "for this app to continue")
+                                .setPositiveButton(
+                                        "OK",
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
                                                 getPermissionsAndOthers();
-                                                break;
-                                            case DialogInterface.BUTTON_NEGATIVE:
-                                                break;
+                                            }
                                         }
-                                    }
-                                });
+                                )
+                                .setNegativeButton("Cancel", null)
+                                .create()
+                                .show();
                     } else {
                         Toast.makeText(this, "Go to settings and enable permissions", Toast.LENGTH_LONG)
                                 .show();
@@ -322,12 +376,14 @@ public class ActivityLogin extends AppCompatActivity {
                         if (response != null) {
                             Log.d(TAG + " Access Code", response.toString());
                         }
-                        loadingDialogAC.dismissLoadingDialog();
+                        dismissWithCheck(loadingDialogAC);
+//                        loadingDialogAC.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loadingDialogAC.dismissLoadingDialog();
+                dismissWithCheck(loadingDialogAC);
+//                loadingDialogAC.dismissLoadingDialog();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
             }
@@ -360,17 +416,19 @@ public class ActivityLogin extends AppCompatActivity {
                                 JSONArray jsonArray = response.getJSONArray("SecurityInfo");
                                 JSONObject info = jsonArray.getJSONObject(0);
                                 deviceId = info.getString("DefaultDeviceUserID");
-                                Log.d(TAG + " Device Id", deviceId.toString());
+                                Log.d(TAG + " Device Id", deviceId);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
-                        loadingDialogDeviceId.dismissLoadingDialog();
+                        dismissWithCheck(loadingDialogDeviceId);
+//                        loadingDialogDeviceId.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loadingDialogDeviceId.dismissLoadingDialog();
+                dismissWithCheck(loadingDialogDeviceId);
+//                loadingDialogDeviceId.dismissLoadingDialog();
                 error.printStackTrace();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
             }
@@ -385,14 +443,14 @@ public class ActivityLogin extends AppCompatActivity {
         queue.add(request);
     }
 
-    void performLogin(String deviceId, String used_id, String user_pass, String lat, String lon) {
+    void performLogin(String deviceId, final String user_id, String user_pass, String lat, String lon) {
         final LoadingDialog loadingDialogLogin = new LoadingDialog(ActivityLogin.this);
         loadingDialogLogin.startLoadingDialog("Logging in...");
-        Log.d(TAG + " user_id", used_id);
+        Log.d(TAG + " user_id", user_id);
         Log.d(TAG + " pass", user_pass);
         String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
                 "LoginToRASolarERPMobileApp?DeviceID=" + deviceId + "&DeviceAppVersionNo=02.7.0.0&" +
-                "MobileAppUserID=" + used_id + "&MobileAppUserPassword=" + user_pass +
+                "MobileAppUserID=" + user_id + "&MobileAppUserPassword=" + user_pass +
                 "&LocationLatitude=" + lat + "&LocationLongitude=" + lon + "&ServiceAccessUserName="
                 + ActivityLogin.SERVICE_ACCESS_USER_NAME + "&ServiceAccessCode=" + ActivityLogin.SERVICE_ACCESS_CODE;
 
@@ -410,10 +468,19 @@ public class ActivityLogin extends AppCompatActivity {
                                 JSONObject info = jsonArray.getJSONObject(0);
 
                                 if (info.getString("MessageCode").equals("200")) {
-                                    loadingDialogLogin.dismissLoadingDialog();
                                     // login successful
+                                    // save user ID to cache
+                                    if (sharedPreferences == null)
+                                        sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME,
+                                                Context.MODE_PRIVATE);
 
-                                    //todo: save caches
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString(SHARED_PREF_KEY_USER_ID, user_id);
+                                    editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, true);
+                                    editor.putLong(SHARED_PREF_KEY_LOGIN_TIME, System.currentTimeMillis());
+                                    editor.apply();
+
+                                    loadingDialogLogin.dismissLoadingDialog();
 
                                     // go to next activity
                                     Intent intent = new Intent(ActivityLogin.this, ActivitySendPresence.class);
@@ -433,12 +500,16 @@ public class ActivityLogin extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }
-                        loadingDialogLogin.dismissLoadingDialog();
+                        dismissWithCheck(loadingDialogLogin);
+                        login_button.setClickable(true);
+//                        loadingDialogLogin.dismissLoadingDialog();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                loadingDialogLogin.dismissLoadingDialog();
+                dismissWithCheck(loadingDialogLogin);
+                login_button.setClickable(true);
+//                loadingDialogLogin.dismissLoadingDialog();
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
             }
@@ -451,5 +522,34 @@ public class ActivityLogin extends AppCompatActivity {
         ));
 
         queue.add(request);
+    }
+
+    public void dismissWithCheck(LoadingDialog dialog) {
+        if (dialog != null) {
+            if (dialog.isShowing()) {
+
+                //get the Context object that was used to great the dialog
+                Context context = ((ContextWrapper) dialog.getContext()).getBaseContext();
+
+                // if the Context used here was an activity AND it hasn't been finished or destroyed
+                // then dismiss it
+                if (context instanceof Activity) {
+                    // Api >=17
+                    if (!((Activity) context).isFinishing() && !((Activity) context).isDestroyed()) {
+                        dismissWithTryCatch(dialog);
+                    }
+                } else
+                    // if the Context used wasn't an Activity, then dismiss it too
+                    dismissWithTryCatch(dialog);
+            }
+        }
+    }
+
+    public void dismissWithTryCatch(LoadingDialog dialog) {
+        try {
+            dialog.dismissLoadingDialog();
+        } catch (final Exception e) {
+            // Do nothing.
+        }
     }
 }

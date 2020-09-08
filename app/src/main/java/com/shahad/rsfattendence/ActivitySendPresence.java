@@ -3,15 +3,19 @@ package com.shahad.rsfattendence;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,6 +39,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -57,8 +62,18 @@ public class ActivitySendPresence extends AppCompatActivity {
     private static final String SERVICE_ACCESS_USER_NAME = "RSFWSA";
     private static final String SERVICE_ACCESS_CODE = "abcd12345";
 
+    private static final String SHARED_PREF_FILE_NAME = "sharedPrefForLogIn";
+    private static final String SHARED_PREF_KEY_IS_LOGGED_IN = "loginStatus";
+    private static final String SHARED_PREF_KEY_LOGIN_TIME = "loginTime";
+
+    private static final int AUTO_LOGIN_DURATION = 30 * 60 * 1000; // automatic login if last login time was
+    // less than 30 minutes.
+    private static final int BACK_PRESS_TIME_INTERVAL = 2500; // time in milliseconds
+
     private static final int REQ_CODE_PANEL = 513;
     private static final int REQ_CODE_BATTERY = 500;
+    private SharedPreferences sharedPreferences;
+    private long backPressTime;
 
     private RequestQueue queue;
     private MaterialAlertDialogBuilder dialogBuilder;
@@ -70,7 +85,6 @@ public class ActivitySendPresence extends AppCompatActivity {
     private String latitude;
     private String longitude;
 
-    private int spinnerSelectionTurn = 0;
     private String selectedCustomerId;
     private ArrayList<String> cusList;
     private ArrayList<String> cusCodeList;
@@ -79,7 +93,8 @@ public class ActivitySendPresence extends AppCompatActivity {
     private TextView promptTextView;
     private Spinner customerSpinner;
     private MaterialButton checkCustomerButton, panelSerialScanButton, batterySerialScanButton,
-            sendPresenceButton;
+            sendPresenceButton, logOutButton;
+    private MaterialToolbar toolbar;
 
     private RelativeLayout panelSerialLayout, batterySerialLayout, spinnerLayout;
     private TextInputEditText panelSerialInput, batterySerialInput;
@@ -88,24 +103,21 @@ public class ActivitySendPresence extends AppCompatActivity {
     private View.OnClickListener spinnerOnclickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            updateSessionLastActiveTime();
             customerSpinner.performClick();
         }
     };
     private AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            if (spinnerSelectionTurn != 0) {
 
-                if (cusCodeList != null)
-                    selectedCustomerId = cusCodeList.get(position);
+            panelSerialLayout.setVisibility(View.VISIBLE);
+            batterySerialLayout.setVisibility(View.VISIBLE);
+            sendPresenceButton.setVisibility(View.VISIBLE);
+            promptTextView.setVisibility(View.GONE);
 
-                panelSerialLayout.setVisibility(View.VISIBLE);
-                batterySerialLayout.setVisibility(View.VISIBLE);
-                sendPresenceButton.setVisibility(View.VISIBLE);
-                promptTextView.setVisibility(View.GONE);
-            }
-
-            spinnerSelectionTurn += 1;
+            if (cusList != null)
+                selectedCustomerId = cusCodeList.get(position);
 
             Log.d(TAG + " spinner", String.valueOf(position));
         }
@@ -119,6 +131,7 @@ public class ActivitySendPresence extends AppCompatActivity {
     private View.OnClickListener panelSerialScanListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            updateSessionLastActiveTime();
             Intent intent = new Intent(ActivitySendPresence.this, ActivityScanner.class);
             startActivityForResult(intent, REQ_CODE_PANEL);
         }
@@ -127,13 +140,23 @@ public class ActivitySendPresence extends AppCompatActivity {
     private View.OnClickListener batterySerialScanListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            updateSessionLastActiveTime();
             Intent intent = new Intent(ActivitySendPresence.this, ActivityScanner.class);
             startActivityForResult(intent, REQ_CODE_BATTERY);
         }
     };
+
+    private long lastPresenceButtonClickTime = 0;
     private View.OnClickListener sendPresenceOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (System.currentTimeMillis() - lastPresenceButtonClickTime < 1500) {
+                Log.d(TAG, "Fast click");
+                return;
+            }
+            lastPresenceButtonClickTime = System.currentTimeMillis();
+
+            updateSessionLastActiveTime();
             //check internet
             new InternetCheck(new InternetCheck.Consumer() {
                 @Override
@@ -153,9 +176,10 @@ public class ActivitySendPresence extends AppCompatActivity {
                             if (selectedCustomerId == null)
                                 isOk = false;
 
-                            if (isOk)
+                            if (isOk) {
                                 sendPresence(panelSerial, batterySerial);
-                            else
+                                sendPresenceButton.setClickable(false);
+                            } else
                                 Toast.makeText(
                                         ActivitySendPresence.this,
                                         "Can not send presence. Please try again",
@@ -175,21 +199,35 @@ public class ActivitySendPresence extends AppCompatActivity {
             });
         }
     };
+
+    private long lastCusButtonClickTime = 0;
     private View.OnClickListener customerCheckOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (System.currentTimeMillis() - lastCusButtonClickTime < 1500) {
+                Log.d(TAG, "Fast click");
+                return;
+            }
+            lastCusButtonClickTime = System.currentTimeMillis();
+
+            updateSessionLastActiveTime();
             //check internet
             new InternetCheck(new InternetCheck.Consumer() {
                 @Override
                 public void accept(Boolean internet) {
                     if (internet) {
-                        if (imei_num != null && latitude != null && longitude != null) {
-                            getCustomers();
-                        } else {
-                            showDialog("Error!", "Ops! Can not read the IMEI " +
-                                    "number or Location. Please try again.");
+                        if (imei_num == null || imei_num.equals("")) {
+                            iconDialog.startIconDialog("Ops! Can not read the IMEI number. " +
+                                    "Please try again.", R.drawable.ic_mobile_cross);
                             getImeiNum();
+                        } else if (latitude == null || latitude.equals("")
+                                || longitude == null || longitude.equals("")) {
+                            iconDialog.startIconDialog("Ops! Can not read Location " +
+                                    "information. Pleas try again!", R.drawable.ic_location);
                             getLocation();
+                        } else if (imei_num != null && latitude != null && longitude != null) {
+                            getCustomers();
+                            checkCustomerButton.setClickable(false);
                         }
                     } else {
                         showDialog("No internet", "Ops! Internet is not available. Please connect to the " +
@@ -197,6 +235,44 @@ public class ActivitySendPresence extends AppCompatActivity {
                     }
                 }
             });
+        }
+    };
+
+    private View.OnClickListener logoutButtonOnclickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(ActivitySendPresence.this);
+            String message = "Are you sure to logout?";
+            updateSessionLastActiveTime();
+
+            builder.setCancelable(true)
+                    .setMessage(message)
+                    .setPositiveButton(
+                            "Yes",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME,
+                                            Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                                    editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false);
+                                    editor.apply();
+                                    finish();
+                                }
+                            }
+                    )
+                    .setNegativeButton(
+                            "No",
+                            null
+                    )
+                    .setNeutralButton(
+                            "Cancel",
+                            null
+                    );
+
+            builder.show();
+
         }
     };
 
@@ -212,8 +288,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
         findElements();
 
-        getImeiNum();
-        getLocation();
+        setSupportActionBar(toolbar);
 
         panelSerialScanButton.setOnClickListener(panelSerialScanListener);
         batterySerialScanButton.setOnClickListener(batterySerialScanListener);
@@ -222,6 +297,30 @@ public class ActivitySendPresence extends AppCompatActivity {
         customerSpinner.setOnItemSelectedListener(itemSelectedListener);
         spinnerButton.setOnClickListener(spinnerOnclickListener);
         sendPresenceButton.setOnClickListener(sendPresenceOnClickListener);
+        logOutButton.setOnClickListener(logoutButtonOnclickListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (backPressTime + BACK_PRESS_TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed();
+            sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false);
+            editor.apply();
+
+            finish();
+            return;
+        } else {
+            Toast.makeText(
+                    ActivitySendPresence.this,
+                    "Please press back again to logout and exit",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+
+        backPressTime = System.currentTimeMillis();
     }
 
     void findElements() {
@@ -242,6 +341,8 @@ public class ActivitySendPresence extends AppCompatActivity {
         batterySerialInput = findViewById(R.id.presence_battery_serial_input);
 
         spinnerButton = findViewById(R.id.presence_spinner_open_button);
+        logOutButton = findViewById(R.id.presence_logout_button);
+        toolbar = findViewById(R.id.presence_toolbar);
     }
 
     void showDialog(String title, String message) {
@@ -258,36 +359,45 @@ public class ActivitySendPresence extends AppCompatActivity {
 
     void populateSpinner(ArrayList<String> list) {
 //        promptTextView.setVisibility(View.GONE);
-        spinnerLayout.setVisibility(View.VISIBLE);
+        if (list.size() > 0) {
+            spinnerLayout.setVisibility(View.VISIBLE);
 
-        String promptMessage = "Select a customer to continue or check again.";
-        promptTextView.setText(promptMessage);
+            String promptMessage = "Select a customer to continue or check again.";
+            promptTextView.setText(promptMessage);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        customerSpinner.setAdapter(adapter);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_item, list);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            customerSpinner.setAdapter(adapter);
+        } else {
+            iconDialog.startIconDialog("No Data Found", R.drawable.ic_cross);
+        }
     }
 
     @SuppressLint("HardwareIds")
     private void getImeiNum() {
-        loadingDialog.startLoadingDialog("Reading IMEI number...");
+//        loadingDialog.startLoadingDialog("Reading IMEI number...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivitySendPresence.this,
                 Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             // permission is already granted. Get the number
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             assert telephonyManager != null;
-            if (Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                imei_num = Settings.Secure.getString(
+                        getContentResolver(),
+                        Settings.Secure.ANDROID_ID
+                );
+            } else if (Build.VERSION.SDK_INT >= 26) {
                 imei_num = telephonyManager.getImei(0);
-                Log.i(TAG + " IMEI", imei_num);
             } else {
                 imei_num = telephonyManager.getDeviceId(0);
-                Log.i(TAG + " IMEI", imei_num);
             }
-            loadingDialog.dismissLoadingDialog();
+
+            Log.i(TAG + " IMEI", imei_num);
+//            loadingDialog.dismissLoadingDialog();
         } else {
-            loadingDialog.dismissLoadingDialog();
+//            loadingDialog.dismissLoadingDialog();
             //permission is not granted. Show error
             showDialog("Permission not granted", "Permission to read IMEI number is not " +
                     "granted. Please log in again with granting the permissions.");
@@ -295,7 +405,8 @@ public class ActivitySendPresence extends AppCompatActivity {
     }
 
     private void getLocation() {
-        loadingDialog.startLoadingDialog("Reading current location...");
+//        final LoadingDialog loadingDialogLoc = new LoadingDialog(ActivitySendPresence.this);
+//        loadingDialogLoc.startLoadingDialog("Reading current location...");
         // first check for permission
         if (ContextCompat.checkSelfPermission(ActivitySendPresence.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -329,12 +440,19 @@ public class ActivitySendPresence extends AppCompatActivity {
                                         "lat: " + latitude
                                                 + "long: " + longitude
                                 );
+
+                                Toast.makeText(
+                                        ActivitySendPresence.this,
+                                        "Latitude: " + latitude +
+                                                " Longitude: " + longitude,
+                                        Toast.LENGTH_LONG
+                                ).show();
                             }
-                            loadingDialog.dismissLoadingDialog();
+//                            loadingDialogLoc.dismissLoadingDialog();
                         }
                     }, Looper.getMainLooper());
         } else {
-            loadingDialog.dismissLoadingDialog();
+//            loadingDialogLoc.dismissLoadingDialog();
             //permission is not granted. Ask for permission
             showDialog("Permission not granted", "Permission to read Location is not " +
                     "granted. Please log in again with granting the permissions.");
@@ -360,26 +478,39 @@ public class ActivitySendPresence extends AppCompatActivity {
                             try {
                                 JSONArray jsonArray = response.getJSONArray("CustomerInfo");
                                 int lenOfArray = jsonArray.length();
-                                cusList = new ArrayList<String>();
-                                cusCodeList = new ArrayList<String>();
+                                cusList = new ArrayList<>();
+                                cusCodeList = new ArrayList<>();
+
+                                String message = "";
 
                                 for (int i = 0; i < lenOfArray; i++) {
                                     JSONObject object = jsonArray.getJSONObject(i);
                                     String temp = object.getString("CustomerName");
                                     String tempCode = object.getString("CustomerCode");
+                                    String code = object.getString("MessageCode");
+                                    message = object.getString("MessageText");
 
+                                    if (code.equals("200")) {
+                                        cusList.add(temp);
+                                        cusCodeList.add(tempCode);
+                                    }
                                     Log.d(TAG + " cus Str", temp);
-                                    cusList.add(temp);
-                                    cusCodeList.add(tempCode);
                                 }
 
-                                populateSpinner(cusList);
+                                if (cusList.size() > 0) {
+                                    populateSpinner(cusList);
+                                } else {
+                                    if (message.equals("") || message == null)
+                                        message = "No output result found.";
+                                    iconDialog.startIconDialog(message, R.drawable.ic_cross);
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
                         }
                         loadingDialog.dismissLoadingDialog();
+                        checkCustomerButton.setClickable(true);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -387,21 +518,24 @@ public class ActivitySendPresence extends AppCompatActivity {
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
                 loadingDialog.dismissLoadingDialog();
-                showDialog("Error", "Error occurred while fetching the customer" +
-                        " list. Please try again.");
+                checkCustomerButton.setClickable(true);
+                showDialog("Result", "No location or customer found this time. " +
+                        "Please try again after a while.");
+
             }
         });
 
         request.setRetryPolicy(new DefaultRetryPolicy(
-                10000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                15000,
+                1,
+                0
         ));
 
+        Log.d(TAG + " timeout", String.valueOf(request.getTimeoutMs()));
         queue.add(request);
     }
 
-    void sendPresence(String panelSerial, String batterySerial) {
+    void sendPresence(final String panelSerial, String batterySerial) {
         loadingDialog.startLoadingDialog("Sending presence information...");
 
         String url = "https://202.164.211.110/RASolarERPWebServices/RASolarERP_SecurityAdmin.svc/" +
@@ -427,8 +561,20 @@ public class ActivitySendPresence extends AppCompatActivity {
                                 if (object.getString("MessageCode").equals("200")) {
                                     // presence successful
 
-                                    iconDialog.startIconDialog("Presence successful",
+                                    iconDialog.startIconDialog("In/Out Presence Successful. Thanks",
                                             R.drawable.ic_check);
+
+                                    panelSerialInput.setText("");
+                                    batterySerialInput.setText("");
+
+                                    spinnerLayout.setVisibility(View.GONE);
+                                    panelSerialLayout.setVisibility(View.GONE);
+                                    batterySerialLayout.setVisibility(View.GONE);
+                                    sendPresenceButton.setVisibility(View.GONE);
+
+                                    String s = "Please check customers to continue";
+                                    promptTextView.setText(s);
+                                    promptTextView.setVisibility(View.VISIBLE);
                                     Log.d(TAG + " PRE SC", object.getString("MessageText"));
                                 } else {
                                     // presence not successful
@@ -442,6 +588,7 @@ public class ActivitySendPresence extends AppCompatActivity {
 
                         }
                         loadingDialog.dismissLoadingDialog();
+                        sendPresenceButton.setClickable(true);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -449,8 +596,9 @@ public class ActivitySendPresence extends AppCompatActivity {
 //                Log.e(TAG + " Access code", Objects.requireNonNull(error.getMessage()));
                 error.printStackTrace();
                 loadingDialog.dismissLoadingDialog();
-                showDialog("Error", "Error occurred while sending presence information. " +
-                        "Please try again.");
+                sendPresenceButton.setClickable(true);
+                showDialog("Request time out", "The server took too long to respond. Please check" +
+                        " your internet connection and try again.");
             }
         });
 
@@ -501,5 +649,78 @@ public class ActivitySendPresence extends AppCompatActivity {
             default:
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        getImeiNum();
+        getLocation();
+
+        Log.d(TAG, "onResume call");
+
+        sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+        long lastLogTime = sharedPreferences.getLong(SHARED_PREF_KEY_LOGIN_TIME, 0);
+
+//        Log.d(TAG, "Last login time: " + lastLogTime);
+
+        if (!(System.currentTimeMillis() - lastLogTime < AUTO_LOGIN_DURATION &&
+                sharedPreferences.getBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false))) {
+            // session expired
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(SHARED_PREF_KEY_IS_LOGGED_IN, false);
+            editor.apply();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(ActivitySendPresence.this);
+
+            builder.setTitle("Session Expired")
+                    .setMessage("The current session has expired. Please login again!")
+                    .setCancelable(false)
+                    .setIcon(R.drawable.ic_cross)
+                    .setPositiveButton(
+                            "Okay",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(ActivitySendPresence.this, ActivityLogin.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                    )
+                    .setNegativeButton(
+                            "Cancel",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    finish();
+                                }
+                            }
+                    );
+
+            builder.create().show();
+        } else {
+            updateSessionLastActiveTime();
+        }
+    }
+
+    private void updateSessionLastActiveTime() {
+        sharedPreferences = getSharedPreferences(SHARED_PREF_FILE_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putLong(SHARED_PREF_KEY_LOGIN_TIME, System.currentTimeMillis());
+        editor.apply();
+
+//        Log.d(TAG+"TIME", "time updated: " +
+//                sharedPreferences.getLong(SHARED_PREF_KEY_LOGIN_TIME, 0));
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+//        Log.d(TAG + "TCH", "touched");
+        updateSessionLastActiveTime();
+
+        return super.onTouchEvent(event);
     }
 }
